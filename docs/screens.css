@@ -92,3 +92,16 @@ button:focus-visible, .names button:focus-visible, .pick button:focus-visible {
   .dossier small { letter-spacing: 0; }
   #kitGuide { padding: 7px; }
 }
+
+.welcome-copy .title-logo {
+  margin: 20px -10px;
+  line-height: 1;
+}
+.title-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@media (max-width: 650px) {
+  .welcome-copy .title-logo { margin: 12px -3px; }
+}
