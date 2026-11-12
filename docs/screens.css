@@ -1,0 +1,17 @@
+[hidden]{display:none!important}
+body:not([data-screen=play]) main{max-width:1080px}
+.welcome,#selection{border:1px solid #50475e;background:#1d192a;overflow:hidden}
+.welcome{display:grid;grid-template-columns:1.12fr 1fr;min-height:470px}
+.welcome-copy,.select-panel{padding:clamp(22px,4vw,54px)}
+.welcome-copy{align-self:center}.welcome-copy h2,#selection h2,.profile h3{margin:0;font-family:'Barlow Condensed',sans-serif}
+.welcome-copy h2{font-size:clamp(68px,9vw,132px);line-height:.83;letter-spacing:-.035em;margin:24px 0}
+.welcome-copy em{color:#ffa4c7}.welcome-copy>p:not(.eyebrow){color:#ddd5e3;line-height:1.8}
+.flow-cta{padding:13px 24px;background:#ffaccc;color:#231728;font-weight:900;border:0;margin-top:12px}.flow-cta:hover{background:#ffd3e5;color:#271a27}.flow-cta:disabled{opacity:.5}
+.cover-art,.poster{background-image:url(assets/selection-gallery.png);background-size:300% 200%;background-position:0 0;aspect-ratio:2/3}
+.cover-art{align-self:center;width:100%}#selection{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1fr);align-items:center}.poster{width:100%;box-shadow:0 0 0 1px #51415f}
+.select-panel h2{font-size:clamp(34px,4vw,61px);line-height:.94;margin:20px 0}.text-button{border:none;padding:0;color:#c9bdce}.pick button[aria-pressed=true]{background:#f5c6db;color:#241522}
+.profile{margin:20px 0}.profile small{color:#efaaca;letter-spacing:.2em}.profile h3{font:900 36px sans-serif;margin:4px 0}.profile>b{color:#dbd4df}
+#kitGuide{white-space:pre-line;font-size:13px;margin:10px 0}.names{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.names button{padding:10px 3px;border-bottom:3px solid var(--member);color:#f8eff7}.names button[aria-pressed=true]{background:var(--member);color:#21182a;font-weight:bold}
+.difficulty{display:flex;gap:12px;align-items:center;margin-top:18px}#matchup{color:#f1d2e0;margin-bottom:0}
+@media(max-width:650px){.welcome{grid-template-columns:1fr .75fr;min-height:0}.welcome-copy{padding:18px 14px}.welcome-copy h2{font-size:clamp(39px,10vw,65px)}.welcome-copy br{display:none}.welcome-copy h2 br{display:block}.welcome-copy p{font-size:12px}.welcome .flow-cta{padding:10px}.cover-art{align-self:stretch;aspect-ratio:auto;background-size:auto 200%;background-position:0 0}
+#selection{display:flex;flex-direction:column}.poster{width:min(100%,240px)}#selection{background:linear-gradient(#f4f1fc 0 250px,#1d192a 250px)}.select-panel{width:100%;padding:18px;background:#1d192a}.select-panel h2{margin:10px 0}.profile{margin:12px 0}}

@@ -24,8 +24,8 @@ function extractSprites(image){
 }
 function loadPixelArt(){
  const atlas=new Image(),bg=new Image();let loaded=0;
- function ready(){loaded++;if(loaded!==2)return;pixelArt.ready=true;document.documentElement.dataset.pixelArt='ready';renderCards();$('start').disabled=false;$('start').innerHTML='대전 시작 <span>↗</span>';$('overlayText').textContent='파이터 선택 후 대전을 시작하세요';}
- function fail(){pixelArt.error='도트 에셋을 불러오지 못했습니다. 새로고침해 주세요.';$('overlayText').textContent=pixelArt.error;document.documentElement.dataset.pixelArt='error';}
+ function ready(){loaded++;if(loaded!==2)return;pixelArt.ready=true;$('launch').disabled=false;$('launch').textContent='대전 시작　→';document.documentElement.dataset.pixelArt='ready';renderCards();$('start').disabled=false;$('start').innerHTML='대전 시작 <span>↗</span>';$('overlayText').textContent='파이터 선택 후 대전을 시작하세요';}
+ function fail(){pixelArt.error='도트 에셋을 불러오지 못했습니다. 새로고침해 주세요.';$('overlayText').textContent=pixelArt.error;$('launch').textContent=pixelArt.error;document.documentElement.dataset.pixelArt='error';}
  atlas.onload=()=>{try{pixelArt.rows=extractSprites(atlas);ready();}catch(e){console.error(e);fail();}};atlas.onerror=fail;
  bg.onload=()=>{pixelArt.background=bg;ready();};bg.onerror=fail;
  atlas.src=FIGHTER_ATLAS_URL;bg.src='assets/training-center.png';

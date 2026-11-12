@@ -21,19 +21,45 @@ const canvas=$('arena'),ctx=canvas.getContext('2d');
 let chosen=[0,1],pick=0,phase='select',fighters=[],wins=[0,0],round=1,time=60,phaseTime=0,last=0,elapsed=0,particles=[],shake=0,keys=new Set(),pressed=new Set(),sound=false,audio=null,aiClock=0,aiInput={},previousPhase='fight',projectiles=[],hitstop=0,specialPressed=false,superPressed=false;
 const bindings=[{left:'KeyA',right:'KeyD',jump:'KeyW',crouch:'KeyS',lp:'KeyU',mp:'KeyI',hp:'KeyO',lk:'KeyJ',mk:'KeyK',hk:'KeyL'}];
 function makeFighter(i){return {meter:0,specialCooldown:0,def:roster[chosen[i]],x:i?2.7:-2.7,y:0,vy:0,hp:100,face:i?-1:1,move:null,moveTime:0,hit:false,stun:0,guard:false,crouch:false,attackHeight:'mid',walk:0,combo:0,comboAge:0};}
-function syncNames(){const player=roster[chosen[0]];$('kitGuide').textContent=player.name+'　 Q '+player.q+'　 /　R '+player.r+'　·　'+player.tip;for(let i=0;i<2;i++)$('name'+(i+1)).textContent=roster[chosen[i]].name;}
+function syncNames(){for(let i=0;i<2;i++)$('name'+(i+1)).textContent=roster[chosen[i]].name;}
 function setup(){fighters=[makeFighter(0),makeFighter(1)];time=60;particles=[];projectiles=[];hitstop=0;aiClock=0;aiInput={};$('status').textContent='SINGLE PLAYER · VS CPU';syncNames();hud();}
 function show(k,t,p,b){$('overlay').style.display='block';$('overlayKicker').textContent=k;$('overlayTitle').textContent=t;$('overlayText').textContent=p;$('start').style.display=b?'inline-block':'none';if(b)$('start').innerHTML=b+' <span>↗</span>';}
 function start(){if(!pixelArt.ready)return;if(phase==='pause'){phase=previousPhase;$('overlay').style.display='none';return;}wins=[0,0];round=1;newRound();}
 function newRound(){setup();phase='countdown';phaseTime=2.1;show('GET READY','ROUND '+String(round).padStart(2,'0'),'2라운드를 먼저 가져가세요',null);keys.clear();pressed.clear();specialPressed=false;superPressed=false;}
-function selectScreen(){phase='select';wins=[0,0];round=1;setup();show('READY WHEN YOU ARE','ENTER THE ARENA','파이터 선택 후 대전을 시작하세요','대전 시작');}
+function selectScreen(){pick=0;screen('selection');renderCards();phase='select';wins=[0,0];round=1;setup();show('READY WHEN YOU ARE','ENTER THE ARENA','파이터 선택 후 대전을 시작하세요','대전 시작');}
 function pause(){if(phase==='fight'||phase==='countdown'){previousPhase=phase;phase='pause';keys.clear();pressed.clear();specialPressed=false;superPressed=false;show('TAKE A BREATH','PAUSED','준비되면 다시 시작하세요','계속하기');}else if(phase==='pause'){phase=previousPhase;$('overlay').style.display='none';}}
 function beep(freq,duration=.08){if(!sound)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(35,audio.currentTime+duration);g.gain.setValueAtTime(.12,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}catch{}}
-function renderCards(){const el=$('roster');el.replaceChildren();roster.forEach((r,i)=>{const b=document.createElement('button');b.style.setProperty('--fighter',r.color);b.className='card'+(chosen[0]===i?' selected1':'')+(chosen[1]===i?' selected2':'');b.setAttribute('aria-label',r.name+' '+r.style+' 선택');b.setAttribute('aria-pressed',String(chosen[pick]===i));b.innerHTML=`<span class="number">0${i+1}</span>${chosen.includes(i)?'<span class="badge">'+(chosen[0]===i?'P1':'')+(chosen[0]===i&&chosen[1]===i?' / ':'')+(chosen[1]===i?'CPU':'')+'</span>':''}<canvas width="300" height="220"></canvas><div class="card-info"><b>${r.name}</b><span>${r.style}</span></div><div class="stats">Q · ${r.q}</div>`;b.onclick=()=>{if(phase!=='select')selectScreen();chosen[pick]=i;setup();renderCards();};el.append(b);let c=b.querySelector('canvas').getContext('2d');drawModel(c,{...makeFighter(0),def:r,x:0,face:1},0,(x,y,z)=>[125+x*85,330-y*85],true);});}
+function screen(id){
+ document.body.dataset.screen=id;
+ for(const name of ['welcome','selection','play'])$(name).hidden=name!==id;
+ window.scrollTo(0,0);
+}
+function renderCards(){
+ const i=chosen[pick], fighter=roster[i], list=$('roster');
+ $('poster').style.backgroundPosition=(i%3*50)+'% '+Math.floor(i/3)*100+'%';
+ $('poster').setAttribute('aria-label',fighter.name+'의 트레이닝 센터 전신 포즈');
+ $('roman').textContent=fighter.roman;
+ $('fighterName').textContent=fighter.name;
+ $('styleName').textContent=fighter.style;
+ $('kitGuide').textContent='Q · '+fighter.q+'　/　R · '+fighter.r+'\n'+fighter.tip;
+ $('matchup').textContent='P1　'+roster[chosen[0]].name+'　 VS　 '+roster[chosen[1]].name+'　CPU';
+ list.replaceChildren();
+ for(const [n,r] of roster.entries()){
+  const button=document.createElement('button');
+  button.textContent=r.name;button.style.setProperty('--member',r.color);
+  button.setAttribute('aria-pressed',String(i===n));
+  button.onclick=()=>{chosen[pick]=n;renderCards();list.children[n].focus();};
+  list.append(button);
+ }
+ for(const side of [0,1])$('pick'+(side+1)).setAttribute('aria-pressed',String(side===pick));
+}
+$('enter').onclick=()=>{selectScreen();$('pick1').focus();};
+$('home').onclick=()=>{screen('welcome');$('enter').focus();};
+$('launch').onclick=()=>{if(pixelArt.ready){screen('play');start();$('pause').focus({preventScroll:true});}};
 $('start').onclick=start;$('pause').onclick=pause;$('reset').onclick=selectScreen;$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-label',sound?'효과음 끄기':'효과음 켜기');beep(400);};
 for(let i=0;i<2;i++)$('pick'+(i+1)).onclick=()=>{pick=i;$('pick1').classList.toggle('active',i===0);$('pick2').classList.toggle('active',i===1);renderCards();};
 const keyAlias={ArrowLeft:'KeyA',ArrowRight:'KeyD',ArrowUp:'KeyW',ArrowDown:'KeyS'};
-addEventListener('keydown',e=>{const code=keyAlias[e.code]||e.code;if(e.target instanceof HTMLSelectElement)return;if(e.code==='Escape'){e.preventDefault();if(!e.repeat)pause();return;}if(code==='KeyQ'||code==='KeyR'){e.preventDefault();if(!e.repeat){specialPressed=code==='KeyQ';superPressed=code==='KeyR';}return;}if(Object.values(bindings[0]).includes(code)){e.preventDefault();if(!keys.has(code))pressed.add(code);keys.add(code);}});
+addEventListener('keydown',e=>{if(document.body.dataset.screen!=='play')return;const code=keyAlias[e.code]||e.code;if(e.target instanceof HTMLSelectElement)return;if(e.code==='Escape'){e.preventDefault();if(!e.repeat)pause();return;}if(code==='KeyQ'||code==='KeyR'){e.preventDefault();if(!e.repeat){specialPressed=code==='KeyQ';superPressed=code==='KeyR';}return;}if(Object.values(bindings[0]).includes(code)){e.preventDefault();if(!keys.has(code))pressed.add(code);keys.add(code);}});
 addEventListener('keyup',e=>keys.delete(keyAlias[e.code]||e.code));addEventListener('blur',()=>{keys.clear();pressed.clear();specialPressed=false;superPressed=false;if(phase==='fight'||phase==='countdown')pause();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&(phase==='fight'||phase==='countdown'))pause();});
 document.querySelectorAll('[data-key]').forEach(b=>{b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(b.dataset.key==='KeyQ')specialPressed=true;else if(b.dataset.key==='KeyR')superPressed=true;else{keys.add(b.dataset.key);pressed.add(b.dataset.key);}};b.onpointerup=b.onpointercancel=()=>keys.delete(b.dataset.key);});
 function input(i){const b=bindings[i];return Object.fromEntries(Object.entries(b).map(([a,k])=>[a,['jump',...Object.keys(moves)].includes(a)?pressed.has(k):keys.has(k)]));}
@@ -45,4 +71,4 @@ stepProjectiles(dt);
 let d=fighters[1].x-fighters[0].x;if(Math.abs(d)<.85&&Math.abs(fighters[0].y-fighters[1].y)<1.3){let push=(.85-Math.abs(d))/2,s=d>=0?1:-1;fighters[0].x-=push*s;fighters[1].x+=push*s;}
 if(time<=0||fighters.some(f=>f.hp<=0)){phase='roundend';phaseTime=2.3;let diff=fighters[0].hp-fighters[1].hp;if(Math.abs(diff)<.01){show('DRAW','DOUBLE KO','라운드를 다시 진행합니다',null);round--;}else{let w=diff>0?0:1;wins[w]++;show(time<=0?'TIME UP':'KNOCKOUT',time<=0?'TIME UP':'K.O.',fighters[w].def.name+' · ROUND WIN',null);}beep(75,.35);}hud();}
 function hud(){for(let i=0;i<2;i++){let f=fighters[i];$('hp'+(i+1)).style.width=f.hp+'%';$('meter'+(i+1)).style.width=f.meter+'%';$('meterLabel'+(i+1)).textContent=f.meter>=100?'SUPER READY · R':'SUPER '+Math.floor(f.meter)+'%';$('wins'+(i+1)).textContent=Array.from({length:2},(_,j)=>wins[i]>j?'●':'○').join(' ');}$('timer').textContent=String(Math.ceil(time)).padStart(2,'0');$('round').textContent='ROUND '+String(round).padStart(2,'0');}
-function frame(ts){let dt=Math.min((ts-last)/1000||0,.035);last=ts;update(dt);pressed.clear();render();requestAnimationFrame(frame);}setup();renderCards();$('start').disabled=true;$('start').textContent='도트 에셋 로딩 중…';loadPixelArt();requestAnimationFrame(frame);
+function frame(ts){let dt=Math.min((ts-last)/1000||0,.035);last=ts;if(document.body.dataset.screen==='play'){update(dt);render();}pressed.clear();requestAnimationFrame(frame);}setup();renderCards();$('start').disabled=true;$('start').textContent='도트 에셋 로딩 중…';loadPixelArt();requestAnimationFrame(frame);
