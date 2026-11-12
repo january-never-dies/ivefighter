@@ -17,26 +17,22 @@ body:not([data-screen=play]) main{max-width:1080px}
 #selection{display:flex;flex-direction:column}.poster{width:min(100%,240px)}#selection{background:linear-gradient(#f4f1fc 0 250px,#1d192a 250px)}.select-panel{width:100%;padding:18px;background:#1d192a}.select-panel h2{margin:10px 0}.profile{margin:12px 0}}
 #selection{display:block;background:#211c2b;--accent:#ff75b5}
 .select-head,.setup,.pick{display:flex;align-items:center;gap:8px}.select-head{justify-content:space-between;padding:12px 22px}.select-head h2{font-size:25px;letter-spacing:1px}.select-head button,.pick button{padding:6px 12px}
-.studio{position:relative;isolation:isolate;overflow:hidden;height:clamp(360px,48vw,494px);background:#faf8ff url(assets/select-wall.png) repeat;background-size:410px 94px}
-.studio-floor{position:absolute;inset:77% 0 0;border-top:7px solid #c5bed7;background:repeating-linear-gradient(100deg,transparent 0 170px,#ccc2de 172px,transparent 174px),linear-gradient(#e9e1f4,#faf0ff)}
+.studio{position:relative;isolation:isolate;overflow:hidden;height:clamp(360px,48vw,494px);background:#faf8ff}
 #poster{position:absolute;inset:0 42% 0 0;touch-action:pan-y;user-select:none}
 #slide{position:absolute;inset:0 7% 6%;overflow:hidden;pointer-events:none}
 #slide img{position:absolute;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 #slide img[data-id="3"]{clip-path:polygon(0 0,100% 0,100% 68%,80% 90%,0 100%)}
-.crest{position:absolute;left:9%;right:9%;height:15%;bottom:4%;border:5px double var(--accent);border-radius:50%;background:#fff9fc;color:var(--accent);display:grid;place-items:center;overflow:hidden}
-.crest span{font:900 clamp(100px,18vw,200px)/.3 Georgia,serif;transform:scale(1.7,.4)}
 #poster button{position:absolute;top:48%;border:1px solid #978ea9;border-radius:50%;width:35px;height:35px;background:#fffc;color:#30223e;font:27px/1 sans-serif}#prev{left:3%}#next{right:3%}
 .dossier{position:absolute;right:4%;top:50%;transform:translateY(-50%);width:35%;padding:clamp(14px,3vw,32px);color:white;background:#261e36ed;border-top:4px solid var(--accent);box-shadow:5px 5px 0 #35254729}
 .dossier small{color:var(--accent);font:bold 11px var(--arcade-font);letter-spacing:.1em}.dossier h3{font-size:clamp(24px,4vw,46px);margin:6px 0}.dossier>b{color:#ded5ee}#stats{margin-top:16px}#stats div{display:grid;grid-template-columns:1fr auto;gap:3px;font-size:12px;margin:8px 0}#stats i{grid-column:span 2;height:4px;background:linear-gradient(to right,var(--accent) var(--fill),#635969 var(--fill))}
 #kitGuide{white-space:pre-line;line-height:1.65;border-top:1px solid #665c70;padding-top:8px;margin-bottom:0}
 .desk{padding:14px 22px 18px}.names{grid-template-columns:repeat(6,1fr);margin-top:8px}#tip{color:#d5c9dd;margin:12px 0}.setup{flex-wrap:wrap;border-top:1px solid #58485f;padding-top:10px}.setup #matchup{margin:0 auto 0 0}.setup .flow-cta{margin:0}
-@media(max-width:600px){.studio{height:320px;background-size:280px 68px}#poster{right:44%}#slide{inset:6% 0 7%}.dossier{right:2%;width:42%;padding:10px}.dossier small{font-size:9px}.dossier h3{margin:3px 0}#stats{margin-top:7px}#kitGuide{font-size:11px}#poster button{top:auto;bottom:2%;width:29px;height:29px}.select-head,.desk{padding:10px}.names{gap:3px}.names button{font-size:11px}.setup #matchup{width:100%}.crest{bottom:12%}.setup{justify-content:space-between}}
+@media(max-width:600px){.studio{height:320px}#poster{right:44%}#slide{inset:6% 0 7%}.dossier{right:2%;width:42%;padding:10px}.dossier small{font-size:9px}.dossier h3{margin:3px 0}#stats{margin-top:7px}#kitGuide{font-size:11px}#poster button{top:auto;bottom:2%;width:29px;height:29px}.select-head,.desk{padding:10px}.names{gap:3px}.names button{font-size:11px}.setup #matchup{width:100%}.setup{justify-content:space-between}}
 
 /* Cabinet trim and stepped highlights echo the native pixel artwork. */
 body {
   background: repeating-linear-gradient(0deg, #181524 0 2px, #151221 2px 4px);
 }
-.prototype-title { font-size: 16px; color: #ffdd94; text-shadow: 2px 2px #662343; }
 .welcome, #selection, .game {
   border: 3px solid #e5b466;
   box-shadow: 0 0 0 2px #482440, inset 0 0 0 2px #664562, 5px 5px #090810;
@@ -117,3 +113,5 @@ body[data-screen="welcome"] main { padding: 0 16px; }
 @keyframes start-blink { 0%, 100% { opacity: 1; } 70% { opacity: 0; } }
 #enter:focus-visible span, #enter:hover span { animation: none; }
 @media (prefers-reduced-motion: reduce) { #enter span { animation: none; } }
+
+#select-stage { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }

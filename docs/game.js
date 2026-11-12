@@ -34,7 +34,6 @@ function screen(id){
  for(const name of ['welcome','selection','play'])$(name).hidden=name!==id;
  window.scrollTo(0,0);
 }
-const emblems=['✿','♧','❦','✥','✦','❖'];
 let displayed=-1;
 function browse(step){chosen[pick]=(chosen[pick]+step+roster.length)%roster.length;renderCards(Math.sign(step));}
 $('prev').onclick=()=>browse(-1);$('next').onclick=()=>browse(1);
@@ -56,7 +55,7 @@ function renderCards(direction=0){
   displayed=i;
  }
  $('selection').style.setProperty('--accent',fighter.color);
- $('emblem').textContent=emblems[i];$('roman').textContent=String(i+1).padStart(2,'0')+' / 06　'+fighter.roman;
+ selectionStage(i, fighter.color);$('roman').textContent=String(i+1).padStart(2,'0')+' / 06　'+fighter.roman;
  $('fighterName').textContent=fighter.name;$('styleName').textContent=fighter.style;
  $('stats').replaceChildren(...[['이동 속도',fighter.speed,5.1],['공격 배율',fighter.power,1.24],['기본 리치 배율',fighter.reach,1.05]].map(([label,value,max])=>{
   const row=document.createElement('div'),name=document.createElement('span'),num=document.createElement('strong'),bar=document.createElement('i');
