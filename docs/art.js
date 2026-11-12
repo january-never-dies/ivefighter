@@ -3,9 +3,46 @@
 // frames cannot bleed into one another, even when their bounding boxes overlap.
 const pixelArt={ready:false,error:null,rows:[],background:null};
 function canvasOf(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+// Eye-line centers for the eight poses of each fighter, on a 1400px atlas proof.
+const faceCenters = [
+ [[110,36],[296,36],[467,44],[648,42],[852,95],[1047,37],[1181,33],[1363,38]],
+ [[105,205],[292,205],[460,214],[642,211],[837,277],[1049,210],[1182,207],[1356,207]],
+ [[104,387],[290,388],[460,388],[641,389],[845,458],[1048,390],[1180,382],[1355,388]],
+ [[102,559],[291,559],[461,562],[643,560],[844,620],[1047,559],[1180,553],[1357,559]],
+ [[106,738],[295,741],[469,744],[644,742],[852,804],[1055,742],[1182,731],[1363,733]],
+ [[105,906],[293,907],[466,908],[642,909],[831,979],[1049,910],[1180,905],[1362,909]]
+];
+function clarifyFaces(pixels) {
+ const {width, height, data} = pixels;
+ const scale = width / 1400;
+ for (const row of faceCenters) for (const [cx, cy] of row) {
+  const left = Math.max(1, Math.floor((cx - 16) * scale));
+  const right = Math.min(width - 2, Math.ceil((cx + 16) * scale));
+  const top = Math.max(1, Math.floor((cy - 15) * scale));
+  const bottom = Math.min(height - 2, Math.ceil((cy + 15) * scale));
+  const changes = [];
+  for (let y = top; y <= bottom; y++) for (let x = left; x <= right; x++) {
+   const dx = (x / scale - cx) / 16, dy = (y / scale - cy) / 15;
+   const mask = Math.min(1, (1 - dx * dx - dy * dy) * 3);
+   const i = (y * width + x) * 4;
+   if (mask <= 0 || data[i + 3] < 250) continue;
+   // Lift local contrast along existing eyes and bangs, leaving flat skin quiet.
+   let sum = 0, count = 0;
+   const light = j => (data[j] + 2 * data[j + 1] + data[j + 2]) / 4;
+   for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+    const j = i + (oy * width + ox) * 4;
+    if (data[j + 3] >= 250) { sum += light(j); count++; }
+   }
+   const edge = light(i) - sum / count;
+   if (Math.abs(edge) > 3) changes.push([i, Math.max(-30, Math.min(22, edge * 1.25)) * mask]);
+  }
+  for (const [i, delta] of changes) for (let c = 0; c < 3; c++) data[i + c] += delta;
+ }
+}
 function extractSprites(image){
  const source=canvasOf(image.width,image.height),sc=source.getContext('2d',{willReadFrequently:true});sc.drawImage(image,0,0);
  const pixels=sc.getImageData(0,0,source.width,source.height),d=pixels.data,w=source.width,h=source.height,n=w*h;
+ clarifyFaces(pixels);
  const visited=new Uint8Array(n),queue=new Int32Array(n),groups=[];
  for(let start=0;start<n;start++){
   if(visited[start]||d[start*4+3]<70)continue;
