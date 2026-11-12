@@ -39,6 +39,81 @@ function clarifyFaces(pixels) {
   for (const [i, delta] of changes) for (let c = 0; c < 3; c++) data[i + c] += delta;
  }
 }
+// Coordinates use the same atlas proof as faceCenters. Work on extracted frames so
+// changing the hair silhouette does not move a fighter's feet or attack anchor.
+function styleCombatHair(rows, scale) {
+ const rearEdges = [
+  [[89,5],[91,10],[86,15],[84,24],[85,33],[91,43],[90,49],[81,55],[74,67],[69,78],[70,88]],
+  [[273,4],[276,10],[271,15],[268,25],[270,37],[278,48],[276,54],[269,58],[260,70],[249,84],[251,91]],
+  [[448,10],[450,17],[445,22],[443,32],[447,45],[452,52],[448,58],[440,64],[427,76],[424,88]],
+  [[624,8],[629,15],[624,23],[623,34],[626,45],[631,54],[627,61],[620,70],[613,91],[618,102]],
+  [[832,65],[836,71],[832,78],[830,89],[832,101],[836,109],[830,115],[822,130],[814,155],[809,165]],
+  [[1026,5],[1029,11],[1024,18],[1021,28],[1025,39],[1030,48],[1024,53],[1017,63],[1016,76],[1019,89]],
+  [[1167,11],[1171,17],[1167,22],[1167,32],[1172,42],[1181,48],[1174,53],[1167,62],[1158,71],[1158,88]],
+  [[1340,4],[1344,11],[1339,18],[1337,30],[1342,41],[1347,48],[1340,54],[1334,62],[1328,79],[1324,91]]
+ ];
+ rows[0].forEach((frame, pose) => {
+  const c = frame.image.getContext('2d'), edge = rearEdges[pose];
+  c.save();
+  c.setTransform(scale, 0, 0, scale, 1-frame.x, 1-frame.y);
+  c.beginPath();
+  c.moveTo(edge[0][0]-115, edge[0][1]-18);
+  edge.forEach(([x,y]) => c.lineTo(x,y));
+  c.lineTo(edge[0][0]-115, edge.at(-1)[1]+18);
+  c.closePath(); c.save(); c.clip(); c.clearRect(0,0,1400,1050); c.restore();
+  const [x,y] = edge[5];
+  // Remove stray pink ends below the clipped tail and blend the former high tie into the crown.
+  const img=c.getImageData(0,0,frame.width,frame.height);
+  for(let j=0;j<img.data.length;j+=4){
+   const ax=((j/4)%frame.width+frame.x-1)/scale;
+   const ay=(Math.floor(j/4/frame.width)+frame.y-1)/scale;
+   const r=img.data[j],g=img.data[j+1],b=img.data[j+2];
+   if(ax<x-20 && ay>edge.at(-1)[1]-8 && ay<edge.at(-1)[1]+22 && r>g*1.25 && b>g*1.12)img.data[j+3]=0;
+   if(ay<edge[0][1]+12 && ax<x+12 && r>g*1.35 && b>g*1.18){
+    img.data[j]=62;img.data[j+1]=40;img.data[j+2]=47;
+   }
+   if(ay<edge[1][1] && ax<x+3 && ax<x+2+(edge[1][1]-ay)*1.3)img.data[j+3]=0;
+  }
+  c.putImageData(img,0,0);
+  c.globalCompositeOperation = 'destination-over';
+  const end = pose === 6 ? -6 : -20;
+  c.translate(x,y);
+  const lock = (points, color) => {
+   c.fillStyle=color; c.beginPath(); points.forEach(([a,b],i)=>i?c.lineTo(a,b):c.moveTo(a,b)); c.closePath(); c.fill();
+  };
+  lock([[3,0],[5,-2],[1,15],[end+5,48],[end+2,55],[end+2,45]],'#d36194');
+  lock([[-2,-3],[2,-4],[-2,14],[end+2,47],[end,54],[-6,18]],'#654350');
+  lock([[0,-9],[6,-4],[3,9],[end+6,49],[end,59],[end+1,48],[end-3,53],[-8,21],[-6,3]],'#39232d');
+  c.restore();
+ });
+ rows[4].forEach((frame, pose) => {
+  const c=frame.image.getContext('2d'), [x,y]=faceCenters[4][pose];
+  c.save(); c.setTransform(scale,0,0,scale,1-frame.x,1-frame.y);
+  c.translate(x,y);
+  if(pose===6)c.rotate(-.43);
+  c.globalCompositeOperation='source-atop';
+  const patch=c.getImageData(0,0,frame.width,frame.height);
+  for(let j=0;j<patch.data.length;j+=4){
+   const dx=((j/4)%frame.width+frame.x-1)/scale-x;
+   const dy=(Math.floor(j/4/frame.width)+frame.y-1)/scale-y;
+   if(dx < -15 || dx > 23 || dy < -26 || dy > 4)continue;
+   const r=patch.data[j],g=patch.data[j+1],b=patch.data[j+2];
+   if(b>r*1.2 && b>g*1.1 && !(dy>-4 && dx>-8 && dx<9)){
+    patch.data[j]=g*.8+18;patch.data[j+1]=g*.54+9;patch.data[j+2]=g*.5+8;
+   }
+  }
+  c.putImageData(patch,0,0);
+  // Dark roots transition into narrow blue streaks on the blunt cheek pieces.
+  for(const [left,top,length] of [[-14,-12,22],[11,-10,17]]) {
+   c.fillStyle='#513633'; c.fillRect(left,top,4,length);
+   c.fillStyle='#77514b'; c.fillRect(left+1,top+1,2,6);
+   c.fillStyle='#5595bf'; c.fillRect(left+1,top+8,2,length-8);
+   c.fillStyle='#9bdcff'; c.fillRect(left+2,top+10,1,length-11);
+  }
+  c.restore();
+ });
+}
+
 function extractSprites(image){
  const source=canvasOf(image.width,image.height),sc=source.getContext('2d',{willReadFrequently:true});sc.drawImage(image,0,0);
  const pixels=sc.getImageData(0,0,source.width,source.height),d=pixels.data,w=source.width,h=source.height,n=w*h;
@@ -57,6 +132,7 @@ function extractSprites(image){
  }
  const rows=Array.from({length:6},()=>[]);for(const g of groups){const row=Math.min(5,Math.floor((g.y+12)/(h/6)));rows[row].push(g);}for(const row of rows)row.sort((a,b)=>a.x-b.x);
  if(rows.some(row=>row.length!==8))throw new Error('Sprite atlas must contain six rows of eight poses: '+rows.map(r=>r.length).join(','));
+ styleCombatHair(rows,w/1400);
  return rows;
 }
 function loadPixelArt(){
@@ -120,8 +196,15 @@ function drawGear(c,f,height){
   }
  }else if(id==='proof'){
   c.translate(skill?22:12,skill?-182:-154);c.rotate(skill?-.16:.13);
-  c.fillStyle='#193737';c.fillRect(-20,-24,44,45);c.fillStyle='#ece6c5';c.fillRect(-17,-21,38,39);
-  c.fillStyle='#306651';c.fillRect(-15,-18,34,11);c.fillStyle='#253f38';c.font='11px Galmuri11, sans-serif';c.fillText('정석',-10,7);
+  c.save();c.scale(skill?f.direction:f.face,1);
+  c.fillStyle='#40353d';c.fillRect(-22,-27,44,55);
+  c.fillStyle='#d6cfd0';c.fillRect(-20,-25,41,52);
+  c.fillStyle='#fffcf6';c.fillRect(-20,-26,40,51);
+  c.fillStyle='#e9787b';c.fillRect(-17,-14,34,1);c.fillRect(-17,0,34,8);
+  c.textAlign='center';c.fillStyle='#241e23';c.font='bold 10px serif';c.fillText('수학의 정석',0,-3,35);
+  c.fillStyle='#fff';c.font='7px Galmuri11, sans-serif';c.fillText('수학(하)',0,7);
+  c.fillStyle='#514951';c.font='5px serif';c.fillText('홍성대 지음',0,16);
+  c.restore();
   if(skill){c.fillStyle='#adffe6';c.font='16px "Kemco Pixel", Galmuri11, monospace';c.fillText('Σ x²',28,-19);}
  }else if(id==='star'&&(skill||!f.move)){c.translate(skill?53:30,-178);drawStar(c,11);}
  else if(id==='slip'&&skill){for(let i=0;i<4;i++)inkLine(c,[[-72-i*12,-23-i*10],[-22,-28-i*10]],'#ffdb72',3);}

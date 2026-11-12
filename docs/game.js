@@ -1,11 +1,11 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const roster=[
-{name:'장원영',roman:'WONYOUNG',style:'밸런스',color:'#ff75b5',skin:'#edc4b0',hair:'#302129',look:'pony',speed:3.8,power:1,reach:1,build:1,detail:'핑크 스트랩 · 롱 포니테일'},
+{name:'장원영',roman:'WONYOUNG',style:'밸런스',color:'#ff75b5',skin:'#edc4b0',hair:'#302129',look:'pony',speed:3.8,power:1,reach:1,build:1,detail:'핑크 브릿지 · 낮게 묶은 생머리'},
 {name:'레이',roman:'REI',style:'파워',color:'#f4d755',skin:'#edc7ad',hair:'#613c2e',look:'bob',speed:2.8,power:1.28,reach:1.08,build:.96,detail:'옐로 포인트 · 브라운 단발'},
 {name:'가을',roman:'GAEUL',style:'스피드',color:'#75ded4',skin:'#e6c3b2',hair:'#191d2b',look:'hood',speed:4.7,power:.84,reach:.94,build:.92,detail:'민트 브레이드 · 후드'},
 {name:'안유진',roman:'YUJIN',style:'아웃복서',color:'#ac88ff',skin:'#edc1aa',hair:'#1e192e',look:'long',speed:4.1,power:.92,reach:1.18,build:1.02,detail:'퍼플 스트릭 · 긴 생머리'},
-{name:'리즈',roman:'LIZ',style:'브루저',color:'#4ccaff',skin:'#f0cbb9',hair:'#55382f',look:'ribbon',speed:3.2,power:1.15,reach:1.02,build:1,detail:'블루 밴드 · 리본 포니테일'},
+{name:'리즈',roman:'LIZ',style:'브루저',color:'#4ccaff',skin:'#f0cbb9',hair:'#55382f',look:'ribbon',speed:3.2,power:1.15,reach:1.02,build:1,detail:'갈색 앞머리 · 하늘색 히메컷'},
 {name:'이서',roman:'LEESEO',style:'테크니션',color:'#ff654b',skin:'#eec3ad',hair:'#382329',look:'braids',speed:4.2,power:.95,reach:1.08,build:.96,detail:'레드 트윈 브레이드'}
 ];
 roster.forEach((fighter,i)=>Object.assign(fighter,kits[i]));
@@ -46,7 +46,7 @@ $('poster').onpointerup=e=>{if(!swipe||e.pointerId!==swipe[2])return;const dx=e.
 function renderCards(direction=0){
  const i=chosen[pick], fighter=roster[i], list=$('roster');
  if(i!==displayed){
-  const img=new Image();img.src='assets/pose-'+i+'.png?v=3';img.alt=fighter.name+'의 선택 포즈';img.draggable=false;img.dataset.id=i;
+  const img=new Image();img.src='assets/pose-'+i+'.png?v=4';img.alt=fighter.name+'의 선택 포즈';img.draggable=false;img.dataset.id=i;
   const dir=direction||Math.sign(i-displayed), old=$('slide').lastElementChild;
   const animate=old&&document.body.dataset.screen==='selection'&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
   $('slide').replaceChildren(img);
