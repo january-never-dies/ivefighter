@@ -1,8 +1,9 @@
-<!doctype html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>一美必殺</title><link rel="stylesheet" href="style.css?v=arcade1"><link rel="stylesheet" href="screens.css?v=title1"></head><body data-screen="welcome">
-<main><h1 class="prototype-title" lang="en">GAME PROTOTYPE.</h1>
-<section id="welcome" class="welcome">
-<div class="welcome-copy"><p class="eyebrow">SINGLE PLAYER ARCADE</p><h2 class="title-logo"><img src="assets/title-ichibi.svg" width="730" height="226" alt="一美必殺"></h2><p>여섯 파이터 중 한 명을 골라 CPU와 대결하세요.<br>두 라운드를 먼저 따내면 승리합니다.</p><button class="flow-cta" id="enter">캐릭터 선택으로　→</button></div>
-<div class="cover-art" aria-hidden="true"></div></section>
+<!doctype html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>一美必殺</title><link rel="stylesheet" href="style.css?v=arcade1"><link rel="stylesheet" href="screens.css?v=start2"></head><body data-screen="welcome">
+<main>
+<section id="welcome" class="title-screen" aria-labelledby="game-title">
+  <h1 id="game-title" class="title-logo"><img src="assets/title-ichibi.svg" width="730" height="226" alt="一美必殺"></h1>
+  <button id="enter" type="button" lang="en"><span>game start</span></button>
+</section>
 <section id="selection" hidden aria-labelledby="selectTitle">
 <div class="select-head"><h2 id="selectTitle">FIGHTER SELECT</h2><button id="home">← 처음으로</button></div>
 <div class="studio"><div class="studio-floor"></div><div id="poster"><div class="crest" aria-hidden="true"><span id="emblem"></span></div><div id="slide"></div><button id="prev" aria-label="이전 멤버">‹</button><button id="next" aria-label="다음 멤버">›</button></div>

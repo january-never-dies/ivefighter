@@ -93,15 +93,27 @@ button:focus-visible, .names button:focus-visible, .pick button:focus-visible {
   #kitGuide { padding: 7px; }
 }
 
-.welcome-copy .title-logo {
-  margin: 20px -10px;
-  line-height: 1;
+body[data-screen="welcome"] { background: #100d18; }
+body[data-screen="welcome"] main { padding: 0 16px; }
+.title-screen {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(14px, 4vh, 36px);
 }
-.title-logo img {
-  display: block;
-  width: 100%;
-  height: auto;
+.title-logo { width: min(100%, 640px); margin: 0; }
+.title-logo img { display: block; width: 100%; height: auto; }
+#enter {
+  min-height: 44px;
+  padding: 8px 16px;
+  color: white;
+  background: transparent;
+  border: 0;
+  font-size: clamp(14px, 2vw, 22px);
 }
-@media (max-width: 650px) {
-  .welcome-copy .title-logo { margin: 12px -3px; }
-}
+#enter span { animation: start-blink 1.4s step-end infinite; }
+@keyframes start-blink { 0%, 100% { opacity: 1; } 70% { opacity: 0; } }
+#enter:focus-visible span, #enter:hover span { animation: none; }
+@media (prefers-reduced-motion: reduce) { #enter span { animation: none; } }
