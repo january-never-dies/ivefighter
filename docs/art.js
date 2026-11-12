@@ -12,33 +12,6 @@ const faceCenters = [
  [[106,738],[295,741],[469,744],[644,742],[852,804],[1055,742],[1182,731],[1363,733]],
  [[105,906],[293,907],[466,908],[642,909],[831,979],[1049,910],[1180,905],[1362,909]]
 ];
-function clarifyFaces(pixels) {
- const {width, height, data} = pixels;
- const scale = width / 1400;
- for (const row of faceCenters) for (const [cx, cy] of row) {
-  const left = Math.max(1, Math.floor((cx - 16) * scale));
-  const right = Math.min(width - 2, Math.ceil((cx + 16) * scale));
-  const top = Math.max(1, Math.floor((cy - 15) * scale));
-  const bottom = Math.min(height - 2, Math.ceil((cy + 15) * scale));
-  const changes = [];
-  for (let y = top; y <= bottom; y++) for (let x = left; x <= right; x++) {
-   const dx = (x / scale - cx) / 16, dy = (y / scale - cy) / 15;
-   const mask = Math.min(1, (1 - dx * dx - dy * dy) * 3);
-   const i = (y * width + x) * 4;
-   if (mask <= 0 || data[i + 3] < 250) continue;
-   // Lift local contrast along existing eyes and bangs, leaving flat skin quiet.
-   let sum = 0, count = 0;
-   const light = j => (data[j] + 2 * data[j + 1] + data[j + 2]) / 4;
-   for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
-    const j = i + (oy * width + ox) * 4;
-    if (data[j + 3] >= 250) { sum += light(j); count++; }
-   }
-   const edge = light(i) - sum / count;
-   if (Math.abs(edge) > 3) changes.push([i, Math.max(-30, Math.min(22, edge * 1.25)) * mask]);
-  }
-  for (const [i, delta] of changes) for (let c = 0; c < 3; c++) data[i + c] += delta;
- }
-}
 // Coordinates use the same atlas proof as faceCenters. Work on extracted frames so
 // changing the hair silhouette does not move a fighter's feet or attack anchor.
 function styleCombatHair(rows, scale) {
@@ -117,7 +90,6 @@ function styleCombatHair(rows, scale) {
 function extractSprites(image){
  const source=canvasOf(image.width,image.height),sc=source.getContext('2d',{willReadFrequently:true});sc.drawImage(image,0,0);
  const pixels=sc.getImageData(0,0,source.width,source.height),d=pixels.data,w=source.width,h=source.height,n=w*h;
- clarifyFaces(pixels);
  const visited=new Uint8Array(n),queue=new Int32Array(n),groups=[];
  for(let start=0;start<n;start++){
   if(visited[start]||d[start*4+3]<70)continue;
