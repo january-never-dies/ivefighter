@@ -34,14 +34,35 @@ function screen(id){
  for(const name of ['welcome','selection','play'])$(name).hidden=name!==id;
  window.scrollTo(0,0);
 }
-function renderCards(){
+const emblems=['✿','♧','❦','✥','✦','❖'];
+let displayed=-1;
+function browse(step){chosen[pick]=(chosen[pick]+step+roster.length)%roster.length;renderCards(Math.sign(step));}
+$('prev').onclick=()=>browse(-1);$('next').onclick=()=>browse(1);
+addEventListener('keydown',e=>{if(document.body.dataset.screen!=='selection'||e.target.tagName==='SELECT')return;
+ if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();browse(e.key==='ArrowLeft'?-1:1);}});
+let swipe=null;
+$('poster').onpointerdown=e=>{if(e.target.closest('button'))return;swipe=[e.clientX,e.clientY,e.pointerId];$('poster').setPointerCapture(e.pointerId);};
+$('poster').onpointercancel=()=>{swipe=null;};
+$('poster').onpointerup=e=>{if(!swipe||e.pointerId!==swipe[2])return;const dx=e.clientX-swipe[0],dy=e.clientY-swipe[1];swipe=null;if(Math.abs(dx)>30&&Math.abs(dx)>Math.abs(dy))browse(dx<0?1:-1);};
+function renderCards(direction=0){
  const i=chosen[pick], fighter=roster[i], list=$('roster');
- $('poster').style.backgroundPosition=(i%3*50)+'% '+Math.floor(i/3)*100+'%';
- $('poster').setAttribute('aria-label',fighter.name+'의 트레이닝 센터 전신 포즈');
- $('roman').textContent=fighter.roman;
- $('fighterName').textContent=fighter.name;
- $('styleName').textContent=fighter.style;
- $('kitGuide').textContent='Q · '+fighter.q+'　/　R · '+fighter.r+'\n'+fighter.tip;
+ if(i!==displayed){
+  const img=new Image();img.src='assets/pose-'+i+'.png';img.alt=fighter.name+'의 선택 포즈';img.draggable=false;img.dataset.id=i;
+  const dir=direction||Math.sign(i-displayed), old=$('slide').lastElementChild;
+  const animate=old&&document.body.dataset.screen==='selection'&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+  $('slide').replaceChildren(img);
+  if(animate){$('slide').prepend(old);old.alt='';old.animate([{transform:'translateX(0)',opacity:1},{transform:'translateX('+(-dir*55)+'%)',opacity:0}],190).onfinish=()=>old.remove();
+   img.animate([{transform:'translateX('+(dir*55)+'%)',opacity:0},{transform:'translateX(0)',opacity:1}],240);}
+  displayed=i;
+ }
+ $('selection').style.setProperty('--accent',fighter.color);
+ $('emblem').textContent=emblems[i];$('roman').textContent=String(i+1).padStart(2,'0')+' / 06　'+fighter.roman;
+ $('fighterName').textContent=fighter.name;$('styleName').textContent=fighter.style;
+ $('stats').replaceChildren(...[['이동 속도',fighter.speed,5.1],['공격 배율',fighter.power,1.24],['기본 리치 배율',fighter.reach,1.05]].map(([label,value,max])=>{
+  const row=document.createElement('div'),name=document.createElement('span'),num=document.createElement('strong'),bar=document.createElement('i');
+  name.textContent=label;num.textContent=value.toFixed(2);bar.style.setProperty('--fill',value/max*100+'%');row.append(name,num,bar);return row;}));
+ $('kitGuide').textContent='Q　'+fighter.q+'\nR　'+fighter.r;
+ $('tip').textContent=fighter.tip;
  $('matchup').textContent='P1　'+roster[chosen[0]].name+'　 VS　 '+roster[chosen[1]].name+'　CPU';
  list.replaceChildren();
  for(const [n,r] of roster.entries()){
