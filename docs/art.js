@@ -84,8 +84,8 @@ function drawGear(c,f,height){
  }else if(id==='proof'){
   c.translate(skill?22:12,skill?-182:-154);c.rotate(skill?-.16:.13);
   c.fillStyle='#193737';c.fillRect(-20,-24,44,45);c.fillStyle='#ece6c5';c.fillRect(-17,-21,38,39);
-  c.fillStyle='#306651';c.fillRect(-15,-18,34,11);c.fillStyle='#253f38';c.font='bold 10px sans-serif';c.fillText('정석',-10,7);
-  if(skill){c.fillStyle='#adffe6';c.font='bold 16px monospace';c.fillText('Σ x²',28,-19);}
+  c.fillStyle='#306651';c.fillRect(-15,-18,34,11);c.fillStyle='#253f38';c.font='11px Galmuri11, sans-serif';c.fillText('정석',-10,7);
+  if(skill){c.fillStyle='#adffe6';c.font='16px "Kemco Pixel", Galmuri11, monospace';c.fillText('Σ x²',28,-19);}
  }else if(id==='star'&&(skill||!f.move)){c.translate(skill?53:30,-178);drawStar(c,11);}
  else if(id==='slip'&&skill){for(let i=0;i<4;i++)inkLine(c,[[-72-i*12,-23-i*10],[-22,-28-i*10]],'#ffdb72',3);}
  else if(id==='force'&&skill&&f.hit){
@@ -102,5 +102,5 @@ function drawSkillObject(c,p,t){
  if(p.kind==='star'){c.rotate(t*14);drawStar(c,p.superMove?21:17);return;}
  c.globalAlpha=p.delay>0?.5:.9;c.scale(1,.52);c.strokeStyle=p.color;c.lineWidth=3;
  c.strokeRect(-29,-29,58,58);c.rotate(Math.PI/4);c.strokeRect(-24,-24,48,48);c.rotate(-Math.PI/4);
- c.fillStyle='#d6fff0';c.font='bold 22px monospace';c.fillText(p.superMove?'∑':'x²',-12,8);
+ c.fillStyle='#d6fff0';c.font='22px "Kemco Pixel", Galmuri11, monospace';c.fillText(p.superMove?'∑':'x²',-12,8);
 }

@@ -1,0 +1,9 @@
+Kemco Pixel Bold by Jayvee D. Enaguas (GrandChaos9000).
+Original font distributed unchanged.
+Source: https://www.dafont.com/kemco-pixel.font
+License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0
+https://creativecommons.org/licenses/by-nc-sa/3.0/
+
+Galmuri11 by quiple. Distributed unchanged under the SIL Open Font License 1.1.
+https://github.com/quiple/galmuri
+See Galmuri-LICENSE.txt.
