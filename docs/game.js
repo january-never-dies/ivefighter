@@ -82,9 +82,9 @@ const titleImage = $('game-title').querySelector('img');
 
 function drawTitleCut(time) {
  const c = cutContext, w = cutCanvas.width, h = cutCanvas.height;
- const travel = Math.min(1, time / .145);
+ const travel = Math.min(1, time / .34);
  const tip = w * travel;
- const slide = 1 - (1 - Math.min(1, Math.max(0, (time - .145) / .16))) ** 3;
+ const slide = 1 - (1 - Math.min(1, Math.max(0, (time - .34) / .20))) ** 3;
  const cutY = x => h * (.92 - .82 * x / w);
  c.clearRect(0, 0, w, h);
  c.imageSmoothingEnabled = false;
@@ -102,44 +102,65 @@ function drawTitleCut(time) {
  }
  piece(false); piece(true);
  if (travel > 0 && travel < 1) {
-  const tail = Math.max(0, tip - w*.31);
+  const tail = Math.max(0, tip - w*.48);
   const shine = c.createLinearGradient(tail,0,tip,0);
   shine.addColorStop(0,'transparent'); shine.addColorStop(.65,'#a2dcff'); shine.addColorStop(1,'#fff');
-  c.fillStyle=shine; c.beginPath(); c.moveTo(tail,cutY(tail));
-  c.lineTo(tip-3,cutY(tip)-1.8); c.lineTo(tip,cutY(tip)); c.lineTo(tip-5,cutY(tip)+1.5);
-  c.closePath(); c.fill();
+  c.shadowColor='#8bdcff'; c.shadowBlur=6; c.fillStyle=shine; c.beginPath(); c.moveTo(tail,cutY(tail));
+  c.lineTo(tip-3,cutY(tip)-3.6); c.lineTo(tip,cutY(tip)); c.lineTo(tip-5,cutY(tip)+3);
+  c.closePath(); c.fill(); c.shadowBlur=0;
  }
 }
 let entering = false;
-$('enter').onclick = async () => {
+let cutFrame = 0;
+
+function animateCut(onFinish, startSound = false) {
+ cancelAnimationFrame(cutFrame);
+ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const logo = $('game-title');
+ let elapsed = 0, previous;
+ function frame(now) {
+  if (document.body.dataset.screen !== 'welcome') return;
+  if (previous === undefined) {
+   logo.classList.add('striking');
+   if (startSound) {
+    slashSound.currentTime = 0;
+    slashSound.play().catch(() => {});
+   }
+  } else {
+   // Keep the blade visible even when a slow frame delays the first paint.
+   elapsed += Math.min((now-previous)/1000, .05);
+  }
+  previous = now;
+  drawTitleCut(reduced ? .55 : elapsed);
+  if (elapsed < (reduced ? .32 : .90)) cutFrame = requestAnimationFrame(frame);
+  else onFinish?.();
+ }
+ cutFrame = requestAnimationFrame(frame);
+}
+
+let introTimer;
+function titleIntro() {
+ clearTimeout(introTimer);
+ $('game-title').classList.remove('striking');
+ introTimer = setTimeout(() => {
+  if (!entering && document.body.dataset.screen === 'welcome') animateCut();
+ }, 450);
+}
+titleImage.decode().then(titleIntro).catch(() => {});
+$('enter').onclick = () => {
  if (entering) return;
  entering = true;
- slashSound.currentTime = 0;
- const playing = slashSound.play();
- const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
- if (!reduced && titleImage.naturalWidth) {
-  // Start at the audio playhead, including any time spent buffering on first use.
-  await Promise.race([playing.catch(() => {}), new Promise(resolve => setTimeout(resolve, 180))]);
-  const synced = !slashSound.paused && slashSound.readyState >= 2;
-  if (!synced) slashSound.pause();
-  const origin = performance.now() - (synced ? slashSound.currentTime * 1000 : 0);
-  drawTitleCut(0);
-  $('game-title').classList.add('striking');
-  await new Promise(resolve => {
-   function frame(now) {
-    const elapsed = Math.max(0, (now-origin)/1000);
-    drawTitleCut(synced && !slashSound.ended && !slashSound.paused ? slashSound.currentTime : elapsed);
-    if (elapsed >= .52) resolve(); else requestAnimationFrame(frame);
-   }
-   requestAnimationFrame(frame);
-  });
- } else playing.catch(() => {});
- selectScreen();
- $('game-title').classList.remove('striking');
- entering = false;
- $('pick1').focus();
+ clearTimeout(introTimer);
+ function finish() {
+  selectScreen();
+  $('game-title').classList.remove('striking');
+  entering = false;
+  $('pick1').focus();
+ }
+ if (titleImage.naturalWidth) animateCut(finish, true);
+ else finish();
 };
-$('home').onclick=()=>{screen('welcome');$('enter').focus();};
+$('home').onclick=()=>{screen('welcome');titleIntro();$('enter').focus();};
 $('launch').onclick=()=>{if(pixelArt.ready){screen('play');start();$('pause').focus({preventScroll:true});}};
 $('start').onclick=start;$('pause').onclick=pause;$('reset').onclick=selectScreen;$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-label',sound?'효과음 끄기':'효과음 켜기');beep(400);};
 for(let i=0;i<2;i++)$('pick'+(i+1)).onclick=()=>{pick=i;$('pick1').classList.toggle('active',i===0);$('pick2').classList.toggle('active',i===1);renderCards();};
