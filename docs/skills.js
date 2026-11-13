@@ -6,7 +6,7 @@ const kits = [
  {id:'proof',style:'수식 설치',speed:3.45,power:.95,reach:.98,q:'수학의 정석 · 명제 설치',r:'최종 증명',tip:'책을 펼쳐 두 걸음 앞에 수식을 남겨요. 레이의 돌진을 읽으면 유리하고, 멀리 선 리즈를 조심하세요.',range:2.6,start:.27,end:.58,pose:5},
  {id:'force',style:'괴력 인파이터',speed:3.15,power:1.24,reach:.94,q:'지반 강타',r:'루프톱 브레이커',tip:'근접 강타로 큰 피해를 주세요. 충격은 지상에만 닿고 원영의 봉 끝에서는 반격하기 어려워요.',range:2.5,start:.37,end:.82,pose:4},
  {id:'star',style:'표창 견제',speed:3.8,power:.92,reach:.98,q:'청색 표창',r:'삼연성',tip:'멀리서 가을의 설치를 견제하세요. 레이는 슬립 킥으로 표창 밑을 통과할 수 있어요.',range:8,start:.16,end:.46,pose:2},
- {id:'braid',style:'브레이드 채찍',speed:3.85,power:.96,reach:1.04,q:'홍사 휘감기',r:'쌍홍 나선',tip:'땋은 머리로 먼 상대를 끌어와요. 끝거리는 길지만 유진을 가까이 당기면 위험해요.',range:4.7,start:.32,end:.86,pose:2}
+ {id:'braid',style:'브레이드 채찍',speed:3.85,power:.96,reach:1.04,q:'홍사 휘감기',r:'쌍홍 나선',tip:'땋은 머리로 먼 상대를 끌어와요. 끝거리는 길지만 상대를 가까이 당기면 위험해요.',range:4.7,start:.32,end:.86,pose:2}
 ];
 function basicMove(f,key){
  const base=moves[key], id=f.def.id;
