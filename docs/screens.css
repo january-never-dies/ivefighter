@@ -104,7 +104,8 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
   padding: 3svh 0 2svh;
   box-sizing: border-box;
 }
-.title-logo { position: relative; isolation: isolate; width: min(92%, 152svh, 1240px); align-self: end; margin: 0; }
+.title-logo { position:relative; isolation:isolate; margin:0; }
+.title-lockup { text-align:center; width: min(92%, 152svh, 1240px); align-self: end; margin: 0; }
 .title-logo img { image-rendering: pixelated; display: block; width: 100%; height: auto; }
 #title-cut { display: none; position: absolute; inset: 0; width: 100%; height: 100%; }
 .title-logo.striking img { opacity: 0; }
@@ -120,25 +121,23 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
   white-space: nowrap;
 }
 .title-subtitle {
-  padding: .12em 0;
-  border-block: 2px solid #ffcc83;
-  color: #ffd477;
-  font-size: clamp(13px, 2.4vw, 28px);
-  line-height: 1;
-  letter-spacing: -.025em;
+  margin: .25em 0 0;
+  font-size: clamp(16px, min(3.8vw, 5svh), 46px);
+  line-height: 1.2;
+  letter-spacing: .035em;
+  color: #ffbd38;
+  transform: skewX(-7deg);
+  filter: drop-shadow(1px 2px #861e3c) drop-shadow(1px 2px #24152d);
 }
-@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+@supports (background-clip: text) {
   .title-subtitle {
-    background-image: linear-gradient(#fff2be 32%, #ffba56 32% 47%, #303444 47% 54%, #8de5db 54% 70%, #ffab4d 70%);
-    -webkit-background-clip: text;
+    background: linear-gradient(#fff6bf 15%, #ffdb65 40%, #ffac22 41% 60%, #ff7025 61% 82%, #ed4037 83%);
     background-clip: text;
     color: transparent;
-    text-shadow: none;
-    filter: drop-shadow(1px 2px #231725);
   }
 }
 @media (max-aspect-ratio: 1/1) {
-  .title-logo { width: 100%; }
+  .title-lockup { width: 100%; }
   .title-screen { grid-template-rows: 1fr minmax(54px, 10svh) minmax(42px, 8svh) .65fr; }
 }
 #enter {
@@ -167,8 +166,8 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
 #select-stage { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
 
 @keyframes title-hover {
- from { transform: translateY(1px); }
- to { transform: translateY(-1px); }
+ from { transform: translateY(4px); }
+ to { transform: translateY(-4px); }
 }
 @media (prefers-reduced-motion: no-preference) {
  .title-logo { animation: title-hover 1.7s ease-in-out infinite alternate; }

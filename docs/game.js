@@ -85,20 +85,6 @@ const bladeDuration = .21;
 const slideDuration = 1.05;
 const cutDuration = bladeDuration + slideDuration + .16;
 
-function drawTitleGlint(c, age, x, y, radius) {
- if (age <= 0) return;
- const growth = Math.min(1, age / .07);
- const size = radius * growth * (1 + .28 * Math.max(0, 1 - Math.abs(age - .07) / .12));
- c.save();
- c.translate(Math.round(x), Math.round(y));
- c.scale(size, size);
- c.fillStyle = '#fff5bd';
- c.beginPath();
- c.moveTo(0,-1); c.lineTo(.2,-.2); c.lineTo(1,0); c.lineTo(.2,.2);
- c.lineTo(0,1); c.lineTo(-.2,.2); c.lineTo(-1,0); c.lineTo(-.2,-.2);
- c.closePath(); c.fill(); c.restore();
-}
-
 function drawTitleCut(time) {
  // Use the logo's design coordinates for motion, physical pixels for rendering.
  const w = 730, h = 226, c = cutContext;
@@ -137,7 +123,6 @@ function drawTitleCut(time) {
   c.lineTo(bladeX-3,cutY(bladeX)-3.6); c.lineTo(bladeX,cutY(bladeX)); c.lineTo(bladeX-5,cutY(bladeX)+3);
   c.closePath(); c.fill(); c.shadowBlur=0;
  }
- drawTitleGlint(c, time - bladeDuration, bladeEndX, cutY(bladeEndX), 8);
 }
 let entering = false;
 let cutFrame = 0;

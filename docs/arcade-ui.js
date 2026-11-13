@@ -28,6 +28,27 @@ function page(title, body) {
  panel.innerHTML = body;
  $('panel-title').focus();
 }
+const modeButtons = [$('enter'), $('duo')];
+function highlightMode(selected) {
+ for (const button of modeButtons) button.classList.toggle('current-mode', button === selected);
+}
+for (const button of modeButtons) {
+ for (const event of ['pointerenter','pointerdown','focus']) {
+  button.addEventListener(event, () => { if (!entering) highlightMode(button); });
+ }
+}
+window.addEventListener('keydown', event => {
+ if (document.body.dataset.screen !== 'welcome' || entering || event.altKey || event.metaKey || event.ctrlKey) return;
+ if (!modeButtons.includes(document.activeElement) && document.activeElement !== document.body) return;
+ const current = modeButtons.find(button => button.classList.contains('current-mode'));
+ if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+  event.preventDefault();
+  modeButtons.find(button => button !== current).focus();
+ } else if (event.key === 'Enter') {
+  event.preventDefault();
+  if (!event.repeat) current.click();
+ }
+});
 function title() { screen('welcome'); $('enter').focus(); }
 function openMode(mode) {
  destination = mode;
