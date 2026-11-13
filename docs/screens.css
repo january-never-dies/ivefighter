@@ -89,7 +89,10 @@ button:focus-visible, .names button:focus-visible, .pick button:focus-visible {
   #kitGuide { padding: 7px; }
 }
 
-body[data-screen="welcome"] { background: #100d18; }
+body[data-screen="welcome"] {
+  background: linear-gradient(180deg, #11172855, #10132160 55%, #12152399),
+              url("assets/training-center.png") center center / cover no-repeat, #212435;
+}
 body[data-screen="welcome"] main { padding: 0 16px; }
 .title-screen {
   min-height: 100vh;
@@ -97,10 +100,14 @@ body[data-screen="welcome"] main { padding: 0 16px; }
   display: grid;
   align-content: center;
   justify-items: center;
-  gap: clamp(14px, 4vh, 36px);
+  row-gap: 0;
 }
 .title-logo { width: min(100%, 640px); margin: 0; }
-.title-logo img { display: block; width: 100%; height: auto; }
+.title-logo img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.title-subtitle, .title-credit, #enter { text-shadow: 2px 2px #231725, 0 0 5px #1a1520; }
+.title-subtitle { margin: 0; color: #ffe5a7; font-size: clamp(15px, 2.5vw, 24px); letter-spacing: .12em; }
+.title-credit { margin: 10px 0 0; color: #fff; font-size: clamp(9px, 1.3vw, 13px); }
+#enter { margin-top: clamp(26px, 6vh, 56px); }
 #enter {
   min-height: 44px;
   padding: 8px 16px;
