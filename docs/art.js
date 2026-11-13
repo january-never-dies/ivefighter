@@ -83,8 +83,10 @@ function drawGear(c,f,height){
   }
  }else if(id==='proof'){
   c.translate(skill?22:12,skill?-182:-154);c.rotate(skill?-.16:.13);
-  c.fillStyle='#193737';c.fillRect(-20,-24,44,45);c.fillStyle='#ece6c5';c.fillRect(-17,-21,38,39);
-  c.fillStyle='#306651';c.fillRect(-15,-18,34,11);c.fillStyle='#253f38';c.font='11px Galmuri11, sans-serif';c.fillText('정석',-10,7);
+  c.fillStyle='#553139';c.fillRect(-20,-24,44,45);
+  c.fillStyle='#fff9f1';c.fillRect(-17,-21,38,39);
+  c.fillStyle='#ec797c';c.fillRect(-15,-17,34,2);c.fillRect(-15,3,34,8);
+  c.fillStyle='#34292c';c.font='11px Galmuri11, sans-serif';c.fillText('정석',-10,0);
   if(skill){c.fillStyle='#adffe6';c.font='16px "Kemco Pixel", Galmuri11, monospace';c.fillText('Σ x²',28,-19);}
  }else if(id==='star'&&(skill||!f.move)){c.translate(skill?53:30,-178);drawStar(c,11);}
  else if(id==='slip'&&skill){for(let i=0;i<4;i++)inkLine(c,[[-72-i*12,-23-i*10],[-22,-28-i*10]],'#ffdb72',3);}
