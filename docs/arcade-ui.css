@@ -60,3 +60,11 @@ body:not([data-mode=duo]) #online-ready{display:none}
 .guide-legend dt{color:var(--ink)}.guide-legend dd{margin:3px 0 0;font-size:13px;line-height:1.5}
 .guide-notes{font-size:12px;color:#d3c8d8}
 @media(max-width:540px){.guide-board{display:block}.guide-arrows{width:24%;margin:3px 0 0 auto}.guide-legend{gap:8px}}
+
+/* Use the body pixel face for instructions, including Latin key names. */
+#selection :is(#tip, #kitGuide),
+.cabinet p, .key-guide,
+.controls :is(p, kbd, .hint),
+#overlayText {
+  font-family: "Galmuri11", monospace;
+}
