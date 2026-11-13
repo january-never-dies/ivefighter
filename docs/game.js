@@ -100,13 +100,20 @@ function drawTitleGlint(c, age, x, y, radius) {
 }
 
 function drawTitleCut(time) {
- const c = cutContext, w = cutCanvas.width, h = cutCanvas.height;
+ // Use the logo's design coordinates for motion, physical pixels for rendering.
+ const w = 730, h = 226, c = cutContext;
+ const box = titleImage.getBoundingClientRect();
+ const width = Math.max(1, Math.round(box.width * window.devicePixelRatio));
+ const height = Math.max(1, Math.round(box.height * window.devicePixelRatio));
+ if (cutCanvas.width !== width) cutCanvas.width = width;
+ if (cutCanvas.height !== height) cutCanvas.height = height;
+ c.setTransform(width / w, 0, 0, height / h, 0, 0);
  const travel = Math.min(1, time / bladeDuration);
  const tip = w * travel;
  const slide = 1 - (1 - Math.min(1, Math.max(0, (time - bladeDuration) / slideDuration))) ** 3;
  const cutY = x => h * (.92 - .82 * x / w);
  c.clearRect(0, 0, w, h);
- c.imageSmoothingEnabled = false;
+ c.imageSmoothingEnabled = true;
  // Ahead of the blade the wordmark is still one piece.
  if (tip < w) c.drawImage(titleImage, travel * titleImage.naturalWidth, 0,
   (1-travel)*titleImage.naturalWidth, titleImage.naturalHeight, tip, 0, w-tip, h);
