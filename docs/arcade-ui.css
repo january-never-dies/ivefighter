@@ -16,7 +16,7 @@
 .mode-menu #enter,.mode-menu #duo{padding:8px 6px 8px 21px}
 .mode-menu button.current-mode::before{
   content:"";position:absolute;left:4px;top:50%;transform:translateY(-50%);
-  width:10px;height:14px;background:#ffda66;
+  width:10px;height:14px;background:currentColor;
   clip-path:polygon(0 0,20% 0,20% 14%,40% 14%,40% 28%,60% 28%,60% 42%,100% 42%,100% 58%,60% 58%,60% 72%,40% 72%,40% 86%,20% 86%,20% 100%,0 100%);
 }
 .mode-menu button:focus-visible{outline:2px dashed #ffd47c;outline-offset:2px}
