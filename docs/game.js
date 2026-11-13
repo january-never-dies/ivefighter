@@ -73,7 +73,21 @@ function renderCards(direction=0){
  }
  for(const side of [0,1])$('pick'+(side+1)).setAttribute('aria-pressed',String(side===pick));
 }
-$('enter').onclick=()=>{selectScreen();$('pick1').focus();};
+const slashSound = new Audio('assets/title-slash.wav');
+slashSound.volume = .55;
+$('enter').onclick = () => {
+ const logo = $('game-title');
+ if (logo.classList.contains('striking')) return;
+ logo.classList.add('striking');
+ slashSound.currentTime = 0;
+ slashSound.play().catch(() => {});
+ const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 340;
+ setTimeout(() => {
+  selectScreen();
+  logo.classList.remove('striking');
+  $('pick1').focus();
+ }, delay);
+};
 $('home').onclick=()=>{screen('welcome');$('enter').focus();};
 $('launch').onclick=()=>{if(pixelArt.ready){screen('play');start();$('pause').focus({preventScroll:true});}};
 $('start').onclick=start;$('pause').onclick=pause;$('reset').onclick=selectScreen;$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-label',sound?'효과음 끄기':'효과음 켜기');beep(400);};
