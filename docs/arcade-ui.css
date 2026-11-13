@@ -1,0 +1,26 @@
+.title-screen{position:relative}
+.tools{position:absolute;top:12px;right:0;display:flex;gap:6px}
+.tools button{min-width:42px;min-height:42px;font-size:18px}
+.mode-menu{display:flex;align-items:center;justify-content:center;gap:clamp(8px,3vw,40px)}
+#duo{font-size:clamp(14px,2vw,22px);color:#ffd47c;border:none;background:transparent;text-shadow:2px 2px #231725;min-height:44px}
+.mode-menu button:is(:hover,:focus-visible){outline:2px solid #ffd47c}
+body[data-screen=arcade]{background:linear-gradient(#11131ccc,#11131cf2),url(assets/training-center.png) center/cover fixed}
+#arcade{display:grid;place-items:center;min-height:88svh}
+.cabinet{width:min(100%,660px);background:#12121ded;border:2px solid #68506a;box-shadow:5px 5px #090913;padding:clamp(18px,4vw,40px);box-sizing:border-box}
+.cabinet header{border-bottom:2px solid #c88855;margin-bottom:20px;padding-bottom:12px}
+.cabinet small,.cabinet label{color:#efbb8e}
+.cabinet h2{font:inherit;font-size:clamp(22px,5vw,42px);color:#ffce69;text-shadow:3px 3px #793a45;margin:8px 0}
+.cabinet h3{font-size:clamp(18px,3vw,26px);color:#fff0cc}
+.cabinet p{line-height:1.6}
+.cabinet button,.cabinet input{font:inherit;min-height:42px;padding:7px 12px}
+.cabinet input{max-width:100%;box-sizing:border-box;background:#171828;color:white;border:1px solid #837482}
+.panel-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.panel-actions button:first-child{color:#ffda88;border-color:#cc9b69}
+.cabinet table{width:100%;border-collapse:collapse;text-align:left}
+.cabinet :is(td,th){padding:5px;border-bottom:1px solid #353047}
+.cabinet th{color:#aaa5be}.my-score{color:#ffda72}
+.vs-preview{display:flex;align-items:center;justify-content:space-around;background:url(assets/training-center.png) center/cover}
+.vs-preview img{width:34%;image-rendering:pixelated}.vs-preview b{color:#ffd471;text-shadow:2px 2px #111}
+.cabinet fieldset{margin:12px 0;border:1px solid #605169}
+body[data-mode=duo] #selection :is(#pick2,.setup label,#matchup,#launch){display:none}
+body:not([data-mode=duo]) #online-ready{display:none}

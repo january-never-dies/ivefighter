@@ -29,10 +29,10 @@ function start(){if(!pixelArt.ready)return;if(phase==='pause'){phase=previousPha
 function newRound(){setup();phase='countdown';phaseTime=2.1;show('GET READY','ROUND '+String(round).padStart(2,'0'),'2라운드를 먼저 가져가세요',null);localInput.reset();}
 function selectScreen(){pick=0;screen('selection');renderCards();phase='select';wins=[0,0];round=1;setup();show('READY WHEN YOU ARE','ENTER THE ARENA','파이터 선택 후 대전을 시작하세요','대전 시작');}
 function pause(){if(phase==='fight'||phase==='countdown'){previousPhase=phase;phase='pause';localInput.reset();show('TAKE A BREATH','PAUSED','준비되면 다시 시작하세요','계속하기');}else if(phase==='pause'){phase=previousPhase;$('overlay').style.display='none';}}
-function beep(freq,duration=.08){if(!sound)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(35,audio.currentTime+duration);g.gain.setValueAtTime(.12,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}catch{}}
+function beep(freq,duration=.08){if(!sound)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(35,audio.currentTime+duration);g.gain.setValueAtTime(Math.max(.001,.12*sampleGain/.58),audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}catch{}}
 function screen(id){
  document.body.dataset.screen=id;
- for(const name of ['welcome','selection','play'])$(name).hidden=name!==id;
+ for(const name of ['welcome','selection','play','arcade'])$(name).hidden=name!==id;
  window.scrollTo(0,0);
 }
 let displayed=-1;
@@ -154,20 +154,21 @@ function animateCut(onFinish) {
  cutFrame = requestAnimationFrame(frame);
 }
 
-$('enter').onclick = () => {
+function enterMode(mode) {
  if (entering) return;
  entering = true;
  if (slashSound.readyState >= 1) slashSound.currentTime = .055;
  slashSound.play().catch(() => {}); // iOS requires playback to begin inside the tap handler.
  function finish() {
-  selectScreen();
   $('game-title').classList.remove('striking');
   entering = false;
-  $('pick1').focus();
+  openMode(mode);
  }
  if (titleImage.naturalWidth) animateCut(finish);
  else finish();
-};
+}
+$('enter').onclick=()=>enterMode('solo');
+$('duo').onclick=()=>enterMode('duo');
 $('home').onclick=()=>{screen('welcome');$('enter').focus();};
 $('launch').onclick=()=>{if(pixelArt.ready){screen('play');start();$('pause').focus({preventScroll:true});}};
 $('start').onclick=start;$('pause').onclick=pause;$('reset').onclick=selectScreen;$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-label',sound?'효과음 끄기':'효과음 켜기');beep(400);};
@@ -227,7 +228,7 @@ function cpu(dt) {
  return out;
 }
 function attack(f,a){if(!f.move&&f.stun<=0){f.guard=false;f.attackHeight=f.y>0.2?'overhead':f.crouch&&moves[a].type==='kick'?'low':'mid';f.move=a;f.moveTime=0;f.hit=false;}}
-function update(dt){if(phase==='pause')return;if(hitstop>0){hitstop=Math.max(0,hitstop-dt);return;}elapsed+=dt;shake=Math.max(0,shake-dt*20);particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy-=8*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);if(phase==='countdown'){phaseTime-=dt;if(phaseTime<.65)show('','FIGHT','',null);if(phaseTime<=0){phase='fight';$('overlay').style.display='none';beep(600);}return;}if(phase==='roundend'){phaseTime-=dt;if(phaseTime<=0){if(wins.some(w=>w>=2)){phase='matchend';let w=wins[0]>wins[1]?0:1;show('MATCH COMPLETE',fighters[w].def.name+' WINS',wins.join(' : ')+' · 다시 도전하세요','다시 대전');}else{round++;newRound();}}return;}if(phase!=='fight')return;time=Math.max(0,time-dt);const inputs = inputSources.map(read => read(dt));
+function update(dt){if(phase==='pause')return;if(hitstop>0){hitstop=Math.max(0,hitstop-dt);return;}elapsed+=dt;shake=Math.max(0,shake-dt*20);particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy-=8*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);if(phase==='countdown'){phaseTime-=dt;if(phaseTime<.65)show('','FIGHT','',null);if(phaseTime<=0){phase='fight';$('overlay').style.display='none';beep(600);}return;}if(phase==='roundend'){phaseTime-=dt;if(phaseTime<=0){if(wins.some(w=>w>=2)){phase='matchend';let w=wins[0]>wins[1]?0:1;soloResult(w);}else{round++;newRound();}}return;}if(phase!=='fight')return;time=Math.max(0,time-dt);const inputs = inputSources.map(read => read(dt));
  inputs.forEach(({pressed}, slot) => {
   if (pressed.special) cast(fighters[slot], false);
   if (pressed.super) cast(fighters[slot], true);
