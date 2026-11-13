@@ -93,21 +93,25 @@ body[data-screen="welcome"] {
   background: linear-gradient(180deg, #11172855, #10132160 55%, #12152399),
               url("assets/training-center.png") center center / cover no-repeat, #212435;
 }
-body[data-screen="welcome"] main { padding: 0 16px; }
+body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
 .title-screen {
   min-height: 100vh;
   min-height: 100svh;
   display: grid;
-  align-content: center;
+  grid-template-rows: minmax(0, 1fr) auto minmax(48px, 12svh) minmax(36px, 10svh);
   justify-items: center;
-  row-gap: 0;
+  align-items: center;
+  padding: 3svh 0 2svh;
+  box-sizing: border-box;
 }
-.title-logo { width: min(100%, 640px); margin: 0; }
+.title-logo { width: min(100%, 165svh, 1240px); align-self: end; margin: 0; }
 .title-logo img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 .title-subtitle, .title-credit, #enter { text-shadow: 2px 2px #231725, 0 0 5px #1a1520; }
-.title-subtitle { margin: 0; color: #ffe5a7; font-size: clamp(15px, 2.5vw, 24px); letter-spacing: .12em; }
-.title-credit { margin: 10px 0 0; color: #fff; font-size: clamp(9px, 1.3vw, 13px); }
-#enter { margin-top: clamp(26px, 6vh, 56px); }
+.title-subtitle { margin: 0; color: #ffe5a7; font-size: clamp(17px, 3vw, 36px); letter-spacing: .12em; }
+.title-credit { margin: 0; color: #fff; font-size: clamp(10px, 1.5vw, 18px); }
+@media (max-aspect-ratio: 1/1) {
+  .title-screen { grid-template-rows: 1fr auto minmax(54px, 10svh) minmax(42px, 8svh) .65fr; }
+}
 #enter {
   min-height: 44px;
   padding: 8px 16px;
