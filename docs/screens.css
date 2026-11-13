@@ -200,7 +200,7 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
   }
   #selection .select-head h2 { color: #392641; text-shadow: 2px 2px #fff; }
   #selection .select-head button { color: #392641; background: #faf7ffed; }
-  #poster { position: relative; inset: auto; grid-column: 1; grid-row: 2 / -1; }
+  #poster { position: relative; inset: auto; grid-column: 1; grid-row: 2 / -1; align-self: stretch; }
   #slide { inset: 1% 5% 0; }
   #slide img { object-position: center bottom; }
   #poster button { top: 50%; bottom: auto; }
