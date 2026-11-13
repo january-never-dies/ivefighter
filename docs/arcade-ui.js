@@ -1,16 +1,8 @@
 'use strict';
 const panel = $('panel-content');
-let destination = 'solo', lesson = 0, tutorialSeen = false, fromSettings = false;
+let destination = 'solo', tutorialSeen = false, fromSettings = false;
 let scoreFromMatch = false, initials = '', roomCode = 'IVE126', sampleGain = .58;
 try { tutorialSeen = !!localStorage.getItem('ive-tutorial-preview'); } catch {}
-const lessons = [
- ['MOVE','A / D 또는 ← / →','좌우로 이동해 상대와의 거리를 조절하세요.'],
- ['JUMP / CROUCH','W / S 또는 ↑ / ↓','위로 점프하고 아래로 앉습니다.'],
- ['PUNCH / KICK','U I O · J K L','윗줄은 펀치, 아랫줄은 킥입니다. 왼쪽부터 약·중·강 공격입니다.'],
- ['GUARD','상대 반대 방향','뒤로 이동해 가드하세요. 낮은 공격은 뒤로 앉아 막습니다.'],
- ['SPECIAL / SUPER','Q / R','Q는 캐릭터 고유기입니다. 게이지가 100%일 때 R로 초필살기를 사용하세요.'],
- ['ROUND','60 SEC · FIRST TO 2','상대 체력을 소진하거나 시간 종료 시 더 많은 체력을 남기세요. 두 라운드를 먼저 따면 승리합니다.']
-];
 function actions(...items) {
  const row = document.createElement('div');
  row.className = 'panel-actions';
@@ -54,7 +46,7 @@ function openMode(mode) {
  destination = mode;
  document.body.dataset.mode = mode;
  fromSettings = false;
- if (!tutorialSeen) return tutorial(0);
+ if (!tutorialSeen) return tutorial();
  continueMode();
 }
 function continueMode() {
@@ -62,20 +54,61 @@ function continueMode() {
  if (destination === 'duo') return lobby();
  selectScreen(); $('pick1').focus();
 }
-function finishLesson() {
+function finishTutorial() {
  tutorialSeen = true;
  try { localStorage.setItem('ive-tutorial-preview','1'); } catch {}
  continueMode();
 }
-function tutorial(index) {
- lesson = index;
- const [name,key,description] = lessons[index];
- page('TRAINING', '<small>'+ (index+1)+' / '+lessons.length+'</small><h3>'+name+'</h3><kbd>'+key+'</kbd><p>'+description+'</p>');
- actions([index===lessons.length-1?'FINISH':'NEXT',()=>lesson===lessons.length-1?finishLesson():tutorial(lesson+1)],['SKIP',finishLesson]);
+const guideActions = {
+ left:['move','왼쪽 이동'], right:['move','오른쪽 이동'], jump:['move','점프'], crouch:['move','앉기'],
+ lp:['punch','약펀치'], mp:['punch','중펀치'], hp:['punch','강펀치'],
+ lk:['kick','약킥'], mk:['kick','중킥'], hk:['kick','강킥'],
+ special:['skill','고유기'], super:['skill','초필살기']
+};
+function guideKey(label, code) {
+ const action = guideActions[combatBindings[code]];
+ if (!action) return '<span class="guide-cap" aria-hidden="true">'+label+'</span>';
+ const [group,name] = action;
+ return '<button type="button" class="guide-cap '+group+'" data-code="'+code+'" aria-label="'+label+' '+name+'">'+label+'</button>';
 }
+function tutorial() {
+ const rows = ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'].map(row =>
+  '<div class="guide-row">'+[...row].map(key=>guideKey(key,'Key'+key)).join('')+'</div>').join('');
+ const arrows = ['Up','Left','Down','Right'].map((key,i)=>guideKey(['↑','←','↓','→'][i],'Arrow'+key)).join('');
+ page('CONTROLS', `<div class="key-guide">
+  <p>색이 있는 키를 누르거나 터치해 기능을 확인하세요.</p>
+  <div class="guide-board"><div class="guide-letters">${rows}</div><div class="guide-arrows">${arrows}</div></div>
+  <output class="guide-readout" aria-live="polite">키 입력 대기</output>
+  <dl class="guide-legend">
+   <div class="move"><dt>이동</dt><dd>A D 좌우 · W 점프 · S 앉기<br>방향키로도 조작 가능</dd></div>
+   <div class="skill"><dt>기술</dt><dd>Q 고유기 · R 초필살기<br>초필살기는 게이지 100%에서 사용</dd></div>
+   <div class="punch"><dt>펀치</dt><dd>U 약 · I 중 · O 강</dd></div>
+   <div class="kick"><dt>킥</dt><dd>J 약 · K 중 · L 강</dd></div>
+  </dl><p class="guide-notes">가드는 상대 반대 방향을 유지하세요. 앉아서도 가드할 수 있어요.<br>라운드당 60초 · 2라운드 선승</p></div>`);
+ const guide = panel.querySelector('.key-guide');
+ const readout = guide.querySelector('output');
+ function report(button) { readout.textContent = button.getAttribute('aria-label'); }
+ guide.onclick = event => {
+  const button = event.target.closest('[data-code]');
+  if (button) report(button);
+ };
+ actions([fromSettings?'설정으로':destination==='duo'?'로비로':'캐릭터 선택',finishTutorial]);
+}
+window.addEventListener('keydown', event => {
+ if (!combatBindings[event.code] || event.altKey || event.metaKey || event.ctrlKey || document.body.dataset.screen !== 'arcade') return;
+ const button = panel.querySelector('.key-guide [data-code="'+event.code+'"]');
+ if (!button) return;
+ event.preventDefault();
+ button.classList.add('held');
+ if (!event.repeat) panel.querySelector('.guide-readout').textContent = button.getAttribute('aria-label');
+});
+window.addEventListener('keyup', event => {
+ if (combatBindings[event.code]) panel.querySelector('.key-guide [data-code="'+event.code+'"]')?.classList.remove('held');
+});
+window.addEventListener('blur', () => panel.querySelectorAll('.key-guide .held').forEach(key=>key.classList.remove('held')));
 function settings() {
  page('SETTINGS','<h3>CONTROLS</h3><p>A D 이동　 W 점프　 S 앉기<br>U I O 펀치　 J K L 킥<br>Q 고유기　 R 초필살기</p>');
- actions(['REPLAY TUTORIAL',()=>{fromSettings=true;tutorial(0);}],['TITLE',title]);
+ actions(['REPLAY TUTORIAL',()=>{fromSettings=true;tutorial();}],['TITLE',title]);
 }
 function soundPanel() {
  page('SOUND','<fieldset><legend>SFX</legend><label><input type="checkbox" id="fx-toggle"> 전투 효과음</label><p><label>효과음 볼륨 <input type="range" id="fx-volume" min="0" max="100"></label></p></fieldset><fieldset disabled><legend>BGM</legend>음원 준비 중</fieldset>');
