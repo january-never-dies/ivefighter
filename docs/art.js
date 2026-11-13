@@ -87,6 +87,76 @@ function styleCombatHair(rows, scale) {
  });
 }
 
+// Sash knot positions in atlas-proof coordinates, registered to each animated waist.
+const sashKnots = [
+ [[103,91],[288,93],[461,96],[649,99],[852,133],[1047,95],[1191,79],[1351,79]],
+ [[101,259],[283,262],[451,264],[639,263],[835,313],[1042,264],[1191,251],[1351,247]],
+ [[99,442],[284,444],[451,444],[640,447],[842,490],[1041,444],[1189,425],[1346,429]],
+ [[100,610],[282,613],[452,613],[639,618],[841,652],[1041,612],[1191,598],[1348,596]],
+ [[100,790],[287,794],[459,794],[642,797],[847,834],[1048,795],[1192,775],[1352,772]],
+ [[99,960],[285,961],[455,961],[639,965],[831,1008],[1045,963],[1191,945],[1350,944]]
+];
+const sashColors = [
+ ['#8b395a','#e887ab'], ['#987126','#f2c84e'], ['#468276','#a0dfc4'],
+ ['#75518c','#c69bd9'], ['#365a99','#7ba8e9'], ['#962e45','#ee697e']
+];
+function finishCombatCostumes(rows, scale) {
+ const eyePairs = [[38,200,58,199],[37,198,57,202],[47,200,66,200],[36,198,56,198],
+  [43,208,64,205],[38,201,58,200],[30,197,51,188],[33,186,53,184]];
+ rows.forEach((frames, member) => frames.forEach((frame, pose) => {
+  const c = frame.image.getContext('2d');
+  if (member === 5) {
+   // Interleave black hair with the existing red plait, keeping the red wraps intact.
+   const [eyeX,eyeY] = faceCenters[member][pose];
+   const pixels = c.getImageData(0,0,frame.width,frame.height);
+   for (let i=0;i<pixels.data.length;i+=4) {
+    const x=((i/4%frame.width)+frame.x-1)/scale;
+    const y=(Math.floor(i/4/frame.width)+frame.y-1)/scale;
+    const r=pixels.data[i], g=pixels.data[i+1], b=pixels.data[i+2];
+    if(x>eyeX-13 || y<eyeY-18 || r<60 || r<2*g || r<1.55*b)continue;
+    if((Math.floor((x*.6+y)/4)&1)===0) {
+     pixels.data[i]=24+r*.14; pixels.data[i+1]=17+g*.22; pixels.data[i+2]=28+b*.23;
+    }
+   }
+   c.putImageData(pixels,0,0);
+  }
+  const [x,y] = sashKnots[member][pose];
+  const [shadow, silk] = sashColors[member];
+  c.save();
+  c.setTransform(scale,0,0,scale,1-frame.x,1-frame.y);
+  c.globalCompositeOperation = 'source-atop';
+  c.save();
+  c.translate(x,y);
+  c.rotate([-.05,.08,.04,-.29,-.38,.05,-.45,.35][pose]);
+  function panel(points, color) {
+   c.fillStyle=color; c.beginPath();
+   points.forEach(([px,py],i)=>i?c.lineTo(px,py):c.moveTo(px,py));
+   c.closePath(); c.fill();
+  }
+  const length = pose===4 || pose===7 ? 13 : 24;
+  panel([[-12,-3],[10,-5],[13,-2],[-11,3]],shadow);
+  panel([[-11,-3],[9,-5],[8,-2],[-10,1]],silk);
+  panel([[4,-2],[10,-2],[8,length-3],[4,length],[5,11]],shadow);
+  panel([[5,0],[8,-1],[6,length-4],[4,length-1]],silk);
+  c.fillStyle='#eac46e';c.fillRect(4,2,4,3);c.fillRect(5,1,2,5);
+  c.restore();
+  if(member===2) {
+   // Register to the tilt of both eyelids, including the leaning hit reaction.
+   const [cx,cy]=faceCenters[member][pose], [a,b,d,e]=eyePairs[pose];
+   const left=(Math.round(cx*scale)-22+a/2)/scale;
+   const top=(Math.round(cy*scale)-21+(b-2*84)/2)/scale;
+   c.translate(left,top);c.rotate(Math.atan2(e-b,d-a));
+   for(const offset of [0,Math.hypot(d-a,e-b)/(2*scale)]) {
+    c.fillStyle='#4c3138';c.fillRect(offset-2.5,-1.4,5,1.8);
+    c.fillStyle='#ffe8d8';c.fillRect(offset-2,.25,4.6,2.3);
+    c.fillStyle='#523d36';c.fillRect(offset+.1,-.2,2.2,2.9);
+    c.fillStyle='#fff2df';c.fillRect(offset+.25,0,.85,.85);
+   }
+  }
+  c.restore();
+ }));
+}
+
 function extractSprites(image){
  const source=canvasOf(image.width,image.height),sc=source.getContext('2d',{willReadFrequently:true});sc.drawImage(image,0,0);
  const pixels=sc.getImageData(0,0,source.width,source.height),d=pixels.data,w=source.width,h=source.height,n=w*h;
@@ -105,6 +175,7 @@ function extractSprites(image){
  const rows=Array.from({length:6},()=>[]);for(const g of groups){const row=Math.min(5,Math.floor((g.y+12)/(h/6)));rows[row].push(g);}for(const row of rows)row.sort((a,b)=>a.x-b.x);
  if(rows.some(row=>row.length!==8))throw new Error('Sprite atlas must contain six rows of eight poses: '+rows.map(r=>r.length).join(','));
  styleCombatHair(rows,w/1400);
+ finishCombatCostumes(rows,w/1400);
  return rows;
 }
 function loadPixelArt(){
