@@ -11,7 +11,7 @@
 .tools button:active{transform:translateY(2px)}
 @media (orientation:portrait){.tools{grid-auto-flow:column}}
 .mode-menu{display:flex;align-items:center;justify-content:center;gap:clamp(8px,3vw,40px)}
-#duo{font-size:clamp(14px,2vw,22px);color:#ffd47c;border:none;background:transparent;text-shadow:2px 2px #231725;min-height:44px}
+#duo{font-size:clamp(14px,2vw,22px);color:white;border:none;background:transparent;text-shadow:2px 2px #231725;min-height:44px}
 .mode-menu button{position:relative}
 .mode-menu #enter,.mode-menu #duo{padding:8px 6px 8px 21px}
 .mode-menu button.current-mode::before{
