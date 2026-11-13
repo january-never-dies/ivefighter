@@ -106,33 +106,9 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
 }
 .title-logo { position: relative; isolation: isolate; width: min(100%, 165svh, 1240px); align-self: end; margin: 0; }
 .title-logo img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
-.title-logo img:first-child { clip-path: polygon(0 0, 100% 0, 100% 9.5%, 78% 28.7%, 36% 62.4%, 0 92.5%); }
-.title-logo .title-lower {
-  position: absolute; inset: 0;
-  clip-path: polygon(0 93.7%, 36% 63.6%, 78% 29.9%, 100% 10.7%, 100% 100%, 0 100%);
-  transform: translate(-.16%, .18%);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .title-logo .title-lower { animation: cut-settle 230ms ease-out 140ms; }
-  .title-logo.striking .title-lower { animation: cut-strike 270ms ease-out; }
-}
-@keyframes cut-settle { 30% { transform: translate(-.5%, .65%); } }
-@keyframes cut-strike { 40% { transform: translate(-.65%, .85%); } }
-/* The cool edge tapers to a point on either side of the gold lettering. */
-.title-logo::before, .title-logo::after {
-  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  clip-path: polygon(0 93%, 36% 61%, 78% 28%, 100% 10%, 84% 26%, 42% 61%, 8% 88%);
-}
-.title-logo::before { background: linear-gradient(108deg, #669bb4, #e9ffff 30%, #70c6e7 70%, #e1ffff); }
-.title-logo::after { background: linear-gradient(100deg, transparent 32%, #a2ebff 44%, white 51%, transparent 65%) no-repeat; opacity: 0; }
-@media (prefers-reduced-motion: no-preference) {
-  .title-logo::before { animation: blade-draw 380ms ease-out both; }
-  .title-logo::after { animation: blade-glint 480ms ease-out; }
-  .title-logo.striking::after { animation: start-glint 340ms ease-out; }
-}
-@keyframes blade-draw { from { mask-image: linear-gradient(90deg, black 50%, transparent 50%); mask-size: 200% 100%; mask-position: right; } to { mask-image: linear-gradient(90deg, black 50%, transparent 50%); mask-size: 200% 100%; mask-position: left; } }
-@keyframes blade-glint { from { opacity: 1; background-position: -110% 0; background-size: 55% 100%; } to { opacity: 0; background-position: 210% 0; background-size: 55% 100%; } }
-@keyframes start-glint { from { opacity: 1; background-position: -110% 0; background-size: 55% 100%; } 75% { opacity: 1; } to { opacity: 0; background-position: 210% 0; background-size: 55% 100%; } }
+#title-cut { display: none; position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+.title-logo.striking img { opacity: 0; }
+.title-logo.striking #title-cut { display: block; }
 .title-subtitle, .title-credit, #enter { text-shadow: 2px 2px #231725, 0 0 5px #1a1520; }
 .title-subtitle { margin: 0; color: #ffe5a7; font-size: clamp(17px, 3vw, 36px); letter-spacing: .12em; }
 .title-credit { margin: 0; color: #fff; font-size: clamp(10px, 1.5vw, 18px); }

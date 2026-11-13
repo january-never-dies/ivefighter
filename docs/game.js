@@ -73,20 +73,71 @@ function renderCards(direction=0){
  }
  for(const side of [0,1])$('pick'+(side+1)).setAttribute('aria-pressed',String(side===pick));
 }
-const slashSound = new Audio('assets/title-slash.wav');
-slashSound.volume = .55;
-$('enter').onclick = () => {
- const logo = $('game-title');
- if (logo.classList.contains('striking')) return;
- logo.classList.add('striking');
+const slashSound = new Audio('assets/title-slash.wav?v=sweep2');
+slashSound.preload = 'auto';
+slashSound.volume = .58;
+const cutCanvas = $('title-cut');
+const cutContext = cutCanvas.getContext('2d');
+const titleImage = $('game-title').querySelector('img');
+
+function drawTitleCut(time) {
+ const c = cutContext, w = cutCanvas.width, h = cutCanvas.height;
+ const travel = Math.min(1, time / .145);
+ const tip = w * travel;
+ const slide = 1 - (1 - Math.min(1, Math.max(0, (time - .145) / .16))) ** 3;
+ const cutY = x => h * (.92 - .82 * x / w);
+ c.clearRect(0, 0, w, h);
+ c.imageSmoothingEnabled = false;
+ // Ahead of the blade the wordmark is still one piece.
+ if (tip < w) c.drawImage(titleImage, travel * titleImage.naturalWidth, 0,
+  (1-travel)*titleImage.naturalWidth, titleImage.naturalHeight, tip, 0, w-tip, h);
+ function piece(upper) {
+  c.save();
+  if (upper) c.translate(-8 * slide, 2.5 * slide);
+  const edge = upper ? -1.1 : 1.1;
+  const outside = upper ? 0 : h;
+  c.beginPath(); c.moveTo(0,outside); c.lineTo(tip,outside);
+  c.lineTo(tip,cutY(tip)+edge); c.lineTo(0,cutY(0)+edge); c.closePath();
+  c.clip(); c.drawImage(titleImage,0,0,w,h); c.restore();
+ }
+ piece(false); piece(true);
+ if (travel > 0 && travel < 1) {
+  const tail = Math.max(0, tip - w*.31);
+  const shine = c.createLinearGradient(tail,0,tip,0);
+  shine.addColorStop(0,'transparent'); shine.addColorStop(.65,'#a2dcff'); shine.addColorStop(1,'#fff');
+  c.fillStyle=shine; c.beginPath(); c.moveTo(tail,cutY(tail));
+  c.lineTo(tip-3,cutY(tip)-1.8); c.lineTo(tip,cutY(tip)); c.lineTo(tip-5,cutY(tip)+1.5);
+  c.closePath(); c.fill();
+ }
+}
+let entering = false;
+$('enter').onclick = async () => {
+ if (entering) return;
+ entering = true;
  slashSound.currentTime = 0;
- slashSound.play().catch(() => {});
- const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 340;
- setTimeout(() => {
-  selectScreen();
-  logo.classList.remove('striking');
-  $('pick1').focus();
- }, delay);
+ const playing = slashSound.play();
+ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if (!reduced && titleImage.naturalWidth) {
+  // Start at the audio playhead, including any time spent buffering on first use.
+  await Promise.race([playing.catch(() => {}), new Promise(resolve => setTimeout(resolve, 180))]);
+  const synced = !slashSound.paused && slashSound.readyState >= 2;
+  if (!synced) slashSound.pause();
+  const origin = performance.now() - (synced ? slashSound.currentTime * 1000 : 0);
+  drawTitleCut(0);
+  $('game-title').classList.add('striking');
+  await new Promise(resolve => {
+   function frame(now) {
+    const elapsed = Math.max(0, (now-origin)/1000);
+    drawTitleCut(synced && !slashSound.ended && !slashSound.paused ? slashSound.currentTime : elapsed);
+    if (elapsed >= .52) resolve(); else requestAnimationFrame(frame);
+   }
+   requestAnimationFrame(frame);
+  });
+ } else playing.catch(() => {});
+ selectScreen();
+ $('game-title').classList.remove('striking');
+ entering = false;
+ $('pick1').focus();
 };
 $('home').onclick=()=>{screen('welcome');$('enter').focus();};
 $('launch').onclick=()=>{if(pixelArt.ready){screen('play');start();$('pause').focus({preventScroll:true});}};
