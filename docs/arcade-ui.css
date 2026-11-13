@@ -1,6 +1,15 @@
 .title-screen{position:relative}
-.tools{position:absolute;top:12px;right:0;display:flex;gap:6px}
-.tools button{min-width:42px;min-height:42px;font-size:18px}
+.tools{position:absolute;top:12px;right:0;display:grid;gap:5px;z-index:2}
+.tools button{
+  display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:0;
+  background:transparent url(assets/title-keycap.svg) center/100% 100% no-repeat;
+  box-shadow:none;cursor:pointer;image-rendering:pixelated;
+}
+.tools svg{width:24px;height:24px;fill:white;stroke:#65300c;stroke-width:2;stroke-linejoin:miter;paint-order:stroke fill;shape-rendering:crispEdges;pointer-events:none}
+.tools button:hover{filter:brightness(1.12)}
+.tools button:focus-visible{outline:2px dashed white;outline-offset:2px}
+.tools button:active{transform:translateY(2px)}
+@media (orientation:portrait){.tools{grid-auto-flow:column}}
 .mode-menu{display:flex;align-items:center;justify-content:center;gap:clamp(8px,3vw,40px)}
 #duo{font-size:clamp(14px,2vw,22px);color:#ffd47c;border:none;background:transparent;text-shadow:2px 2px #231725;min-height:44px}
 .mode-menu button:is(:hover,:focus-visible){outline:2px solid #ffd47c}
