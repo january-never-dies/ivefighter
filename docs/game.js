@@ -36,7 +36,17 @@ function screen(id){
  window.scrollTo(0,0);
 }
 let displayed=-1;
-function browse(step){chosen[pick]=(chosen[pick]+step+roster.length)%roster.length;renderCards(Math.sign(step));}
+const rosterStepSound = new Audio('assets/roster-step.wav');
+rosterStepSound.preload = 'auto';
+function browse(step){
+ chosen[pick]=(chosen[pick]+step+roster.length)%roster.length;
+ renderCards(Math.sign(step));
+ if(sampleGain > 0){
+  rosterStepSound.volume = sampleGain;
+  rosterStepSound.currentTime = 0;
+  rosterStepSound.play().catch(()=>{});
+ }
+}
 $('prev').onclick=()=>browse(-1);$('next').onclick=()=>browse(1);
 addEventListener('keydown',e=>{if(document.body.dataset.screen!=='selection'||e.target.tagName==='SELECT')return;
  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();browse(e.key==='ArrowLeft'?-1:1);}});
