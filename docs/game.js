@@ -73,7 +73,7 @@ function renderCards(direction=0){
  }
  for(const side of [0,1])$('pick'+(side+1)).setAttribute('aria-pressed',String(side===pick));
 }
-const slashSound = new Audio('assets/title-slash.wav?v=sweep2');
+const slashSound = new Audio('assets/dragon-studio-sword-slice-393847.mp3');
 slashSound.preload = 'auto';
 slashSound.volume = .58;
 const cutCanvas = $('title-cut');
@@ -127,7 +127,7 @@ function animateCut(onFinish, startSound = false) {
   if (previous === undefined) {
    logo.classList.add('striking');
    if (startSound) {
-    slashSound.currentTime = 0;
+    slashSound.currentTime = .055; // Skip the quiet lead-in before the blade attack.
     slashSound.play().catch(() => {});
    }
   } else {
