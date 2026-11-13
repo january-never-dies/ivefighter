@@ -106,6 +106,18 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
 }
 .title-logo { position: relative; isolation: isolate; width: min(100%, 165svh, 1240px); align-self: end; margin: 0; }
 .title-logo img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.title-logo img:first-child { clip-path: polygon(0 0, 100% 0, 100% 9.5%, 78% 28.7%, 36% 62.4%, 0 92.5%); }
+.title-logo .title-lower {
+  position: absolute; inset: 0;
+  clip-path: polygon(0 93.7%, 36% 63.6%, 78% 29.9%, 100% 10.7%, 100% 100%, 0 100%);
+  transform: translate(-.16%, .18%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .title-logo .title-lower { animation: cut-settle 230ms ease-out 140ms; }
+  .title-logo.striking .title-lower { animation: cut-strike 270ms ease-out; }
+}
+@keyframes cut-settle { 30% { transform: translate(-.5%, .65%); } }
+@keyframes cut-strike { 40% { transform: translate(-.65%, .85%); } }
 /* The cool edge tapers to a point on either side of the gold lettering. */
 .title-logo::before, .title-logo::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
