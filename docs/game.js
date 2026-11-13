@@ -119,34 +119,29 @@ function drawTitleCut(time) {
   c.clip(); c.drawImage(titleImage,0,0,w,h); c.restore();
  }
  piece(false); piece(true);
+ const bladeEndX = w - 11;
  if (travel > 0 && travel < 1) {
-  const tail = Math.max(0, tip - w*.48);
-  const shine = c.createLinearGradient(tail,0,tip,0);
+  const bladeX = travel * bladeEndX;
+  const tail = Math.max(0, bladeX - w*.48);
+  const shine = c.createLinearGradient(tail,0,bladeX,0);
   shine.addColorStop(0,'transparent'); shine.addColorStop(.65,'#a2dcff'); shine.addColorStop(1,'#fff');
   c.shadowColor='#8bdcff'; c.shadowBlur=6; c.fillStyle=shine; c.beginPath(); c.moveTo(tail,cutY(tail));
-  c.lineTo(tip-3,cutY(tip)-3.6); c.lineTo(tip,cutY(tip)); c.lineTo(tip-5,cutY(tip)+3);
+  c.lineTo(bladeX-3,cutY(bladeX)-3.6); c.lineTo(bladeX,cutY(bladeX)); c.lineTo(bladeX-5,cutY(bladeX)+3);
   c.closePath(); c.fill(); c.shadowBlur=0;
  }
- drawTitleGlint(c, time - bladeDuration * (248 / w) - .04, 248 - 8 * slide, 37 + 2.5 * slide, 14);
- drawTitleGlint(c, time - bladeDuration * (662 / w) - .04, 662, 133, 9);
+ drawTitleGlint(c, time - bladeDuration, bladeEndX, cutY(bladeEndX), 8);
 }
 let entering = false;
 let cutFrame = 0;
 
-function animateCut(onFinish, startSound = false) {
+function animateCut(onFinish) {
  cancelAnimationFrame(cutFrame);
  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
- const logo = $('game-title');
+ $('game-title').classList.add('striking');
  let elapsed = 0, previous;
  function frame(now) {
   if (document.body.dataset.screen !== 'welcome') return;
-  if (previous === undefined) {
-   logo.classList.add('striking');
-   if (startSound) {
-    slashSound.currentTime = .055; // Skip the quiet lead-in before the blade attack.
-    slashSound.play().catch(() => {});
-   }
-  } else {
+  if (previous !== undefined) {
    // Keep the blade visible even when a slow frame delays the first paint.
    elapsed += Math.min((now-previous)/1000, .05);
   }
@@ -158,29 +153,21 @@ function animateCut(onFinish, startSound = false) {
  cutFrame = requestAnimationFrame(frame);
 }
 
-let introTimer;
-function titleIntro() {
- clearTimeout(introTimer);
- $('game-title').classList.remove('striking');
- introTimer = setTimeout(() => {
-  if (!entering && document.body.dataset.screen === 'welcome') animateCut();
- }, 450);
-}
-titleImage.decode().then(titleIntro).catch(() => {});
 $('enter').onclick = () => {
  if (entering) return;
  entering = true;
- clearTimeout(introTimer);
+ if (slashSound.readyState >= 1) slashSound.currentTime = .055;
+ slashSound.play().catch(() => {}); // iOS requires playback to begin inside the tap handler.
  function finish() {
   selectScreen();
   $('game-title').classList.remove('striking');
   entering = false;
   $('pick1').focus();
  }
- if (titleImage.naturalWidth) animateCut(finish, true);
+ if (titleImage.naturalWidth) animateCut(finish);
  else finish();
 };
-$('home').onclick=()=>{screen('welcome');titleIntro();$('enter').focus();};
+$('home').onclick=()=>{screen('welcome');$('enter').focus();};
 $('launch').onclick=()=>{if(pixelArt.ready){screen('play');start();$('pause').focus({preventScroll:true});}};
 $('start').onclick=start;$('pause').onclick=pause;$('reset').onclick=selectScreen;$('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-label',sound?'효과음 끄기':'효과음 켜기');beep(400);};
 for(let i=0;i<2;i++)$('pick'+(i+1)).onclick=()=>{pick=i;$('pick1').classList.toggle('active',i===0);$('pick2').classList.toggle('active',i===1);renderCards();};
