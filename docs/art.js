@@ -151,44 +151,59 @@ const combatEyes = [
  [[109.0,758.5,12.0,0.5],[300.5,762.0,11.5,0.0],[485.5,762.5,12.0,-3.0],[664.0,764.5,12.0,-2.0],[877.5,827.5,10.0,-3.0],[1086.0,766.0,12.0,-1.5],[1216.5,750.0,10.5,-2.5],[1403.5,748.5,12.0,-1.5]],
  [[107.5,934.5,11.0,2.0],[298.0,935.5,10.5,1.0],[477.5,936.5,10.0,-1.0],[660.5,936.5,10.5,-1.0],[857.0,1008.5,10.5,-1.0],[1080.5,938.0,10.5,-1.0],[1212.5,931.5,10.5,-5.0],[1404.0,931.0,10.0,-1.0]]
 ];
-// One authored face tile. Transparent corners leave the fringe and jaw silhouette visible.
-const faceTile = [
- '     fff     fff    ',
- '   fffffff fffffff  ',
- 'sfffddddffffffdddffs',
- 'sffddwwddffffdwwddfs',
- 'sfffwhiddffffwhiddfs',
- 'sfffwiiddffffwiiddfs',
- 'sfffwiirdffffwiirdfs',
- 'sfffwrrrdffffwrrrdfs',
- 'sffffaaaffffffaafffs',
- ' sffbbffffffsffffbs ',
- '  sffffffffffffffs  ',
- '   sffffffffmmffs   ',
- '    ssfffffffffs    ',
- '      sssssssss     '
+// Paint on the combat pixel grid once, after shrinking the body. Each character's
+// iris has separate pupil, midtone and lower-rim colours that survive display scaling.
+const eyePalettes = [
+ ['#492937','#ac5c77','#f4b8c7'], ['#432d24','#ad7832','#f5cf75'],
+ ['#204349','#398c8b','#a7e4cd'], ['#392b50','#8263aa','#d4b9ec'],
+ ['#263957','#497fa9','#b4e5fa'], ['#482a35','#ab545b','#f0a99c']
+];
+const combatFacePixels = [
+ '  sfff       ff   ',
+ ' sfffff    fffff  ',
+ 'sllkkllfffllkkkls ',
+ 'slwpkppffflwpkkps ',
+ 'sfwhpppffffwhppps ',
+ 'sfwmpppffffwmppps ',
+ 'sfwmmmmffffwmmmfs ',
+ 'sffwaamffffwaafss ',
+ ' sffffffffffnfffs ',
+ ' sfbffffffffffbs  ',
+ '  sffffffffmmffs  ',
+ '   sffffffffffs   ',
+ '     sfffffss     '
 ];
 function drawCombatFaces(rows) {
- const colors = {s:'#e7a582',f:'#ffd4ac',d:'#302335',w:'#fff3df',h:'#ffffff',
-  i:'#463046',r:'#895a6b',a:'#9c695c',b:'#efa399',m:'#904c58'};
- rows.forEach((frames,member)=>frames.forEach((frame,pose)=>{
-  const [eyeX,eyeY,dx,dy] = combatEyes[member][pose];
-  const unit = Math.hypot(dx,dy)/9, cos=dx/(9*unit), sin=dy/(9*unit);
-  const cx = eyeX-frame.x+1, cy = eyeY-frame.y+1;
-  const c=frame.image.getContext('2d');
-  c.save();
-  c.globalCompositeOperation='source-atop';
-  // Inverse sample onto integer sprite pixels so tilted poses have crisp edges.
-  for(let y=Math.max(0,Math.floor(cy-22*unit));y<Math.min(frame.height,cy+22*unit);y++){
-   for(let x=Math.max(0,Math.floor(cx-22*unit));x<Math.min(frame.width,cx+22*unit);x++){
-    const u=Math.floor(((x-cx)*cos+(y-cy)*sin)/unit+6);
-    const v=Math.floor((-(x-cx)*sin+(y-cy)*cos)/unit+5);
-    const color=colors[faceTile[v]?.[u]];
-    if(color){c.fillStyle=color;c.fillRect(x,y,1,1);}
+ rows.forEach((frames,member)=>{
+  const scale=140.4/frames[0].height; // same 3.6 arena units at 39 pixels/unit
+  const [p,m,a]=eyePalettes[member];
+  const palette={s:'#efb998',f:'#ffe0c3',l:'#382730',k:'#201f2b',w:'#fff8ec',
+   h:'#ffffff',p,m,a,n:'#f3c4a2',b:'#f4b0a3'};
+  for(const [pose,frame] of frames.entries()){
+   const original=frame.image;
+   const sprite=canvasOf(Math.round(frame.width*scale),Math.round(frame.height*scale));
+   const c=sprite.getContext('2d');
+   c.imageSmoothingEnabled=false;
+   const [x,y,dx,dy]=combatEyes[member][pose];
+   const sx=sprite.width/frame.width, sy=sprite.height/frame.height;
+   const eyeX=Math.round((x-frame.x+1)*sx), eyeY=Math.round((y-frame.y+1)*sy);
+   const angle=Math.atan2(dy*sy,dx*sx), cos=Math.cos(angle),sin=Math.sin(angle);
+   // Space the far eye for each pose without compressing its four colour bands.
+   const gap=Math.max(2,Math.round(Math.hypot(dx*sx,dy*sy))-6);
+   const tile=combatFacePixels.map(line=>line.slice(0,7)+line[7].repeat(gap)+line.slice(10));
+   for(let py=eyeY-12;py<=eyeY+17;py++)for(let px=eyeX-12;px<=eyeX+20;px++){
+    const u=Math.round((px-eyeX)*cos+(py-eyeY)*sin)+4;
+    const v=Math.round((py-eyeY)*cos-(px-eyeX)*sin)+4;
+    const key=tile[v]?.[u];
+    if(!palette[key])continue;
+    c.fillStyle=v===10 && key==='m'?'#cb7a78':palette[key];
+    c.fillRect(px,py,1,1);
    }
+   c.globalCompositeOperation='destination-in';
+   c.drawImage(original,0,0,sprite.width,sprite.height);
+   frame.faceOverlay=sprite;
   }
-  c.restore();
- }));
+ });
 }
 
 function extractSprites(image){
@@ -231,8 +246,9 @@ function drawModel(c,f,t,project,portrait=false){
  c.save();c.imageSmoothingEnabled=false;c.translate(Math.round(origin[0]),Math.round(origin[1]+bob));c.scale(f.move==='skill'?f.direction:f.face,1);
  if(f.move==='skill'&&!portrait){const swing=Math.sin(Math.PI*Math.min(1,f.moveTime/f.def.end));if(f.def.id==='slip'){c.rotate(swing*.19);c.scale(1,1-swing*.12);}if(f.def.id==='force')c.rotate(f.hit?swing*.12:-swing*.16);if(f.def.id==='braid')c.rotate(-swing*.1);}
  if(f.hp<=0&&!portrait){c.translate(70,-105);c.rotate(-Math.PI/2);}
- if(portrait){c.drawImage(sprite.image,0,0,sprite.width,sprite.height,-width*.5,-height,width,height);}
- else{c.drawImage(sprite.image,0,0,sprite.width,sprite.height,-Math.round(width*anchors[pose]),-height,width,height);}
+ const left=portrait?-width*.5:-Math.round(width*anchors[pose]);
+ c.drawImage(sprite.image,left,-height,width,height);
+ c.drawImage(sprite.faceOverlay,left,-height,width,height);
  drawGear(c,f,Math.round(unit*3.6));c.restore();
 }
 function render(){const c=ctx,W=1200,H=600;c.save();c.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);c.imageSmoothingEnabled=false;c.clearRect(0,0,W,H);
