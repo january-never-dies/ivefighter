@@ -47,7 +47,7 @@ $('poster').onpointerup=e=>{if(!swipe||e.pointerId!==swipe[2])return;const dx=e.
 function renderCards(direction=0){
  const i=chosen[pick], fighter=roster[i], list=$('roster');
  if(i!==displayed){
-  const img=new Image();img.src='assets/pose-'+i+'.png?v=costume2';img.alt=fighter.name+'의 선택 포즈';img.draggable=false;img.dataset.id=i;
+  const img=new Image();img.src='assets/pose-'+i+'.png?v=fringe3';img.alt=fighter.name+'의 선택 포즈';img.draggable=false;img.dataset.id=i;
   const dir=direction||Math.sign(i-displayed), old=$('slide').lastElementChild;
   const animate=old&&document.body.dataset.screen==='selection'&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
   $('slide').replaceChildren(img);
