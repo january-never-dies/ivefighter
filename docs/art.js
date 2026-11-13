@@ -101,8 +101,6 @@ const sashColors = [
  ['#75518c','#c69bd9'], ['#365a99','#7ba8e9'], ['#962e45','#ee697e']
 ];
 function finishCombatCostumes(rows, scale) {
- const eyePairs = [[38,200,58,199],[37,198,57,202],[47,200,66,200],[36,198,56,198],
-  [43,208,64,205],[38,201,58,200],[30,197,51,188],[33,186,53,184]];
  rows.forEach((frames, member) => frames.forEach((frame, pose) => {
   const c = frame.image.getContext('2d');
   if (member === 5) {
@@ -140,17 +138,53 @@ function finishCombatCostumes(rows, scale) {
   panel([[5,0],[8,-1],[6,length-4],[4,length-1]],silk);
   c.fillStyle='#eac46e';c.fillRect(4,2,4,3);c.fillRect(5,1,2,5);
   c.restore();
-  if(member===2) {
-   // Register to the tilt of both eyelids, including the leaning hit reaction.
-   const [cx,cy]=faceCenters[member][pose], [a,b,d,e]=eyePairs[pose];
-   const left=(Math.round(cx*scale)-22+a/2)/scale;
-   const top=(Math.round(cy*scale)-21+(b-2*84)/2)/scale;
-   c.translate(left,top);c.rotate(Math.atan2(e-b,d-a));
-   for(const offset of [0,Math.hypot(d-a,e-b)/(2*scale)]) {
-    c.fillStyle='#4c3138';c.fillRect(offset-2.5,-1.4,5,1.8);
-    c.fillStyle='#ffe8d8';c.fillRect(offset-2,.25,4.6,2.3);
-    c.fillStyle='#523d36';c.fillRect(offset+.1,-.2,2.2,2.9);
-    c.fillStyle='#fff2df';c.fillRect(offset+.25,0,.85,.85);
+  c.restore();
+ }));
+}
+
+// Left eye and vector to the right eye in the source atlas (1448px wide).
+const combatEyes = [
+ [[113.0,35.5,10.5,0.0],[310.0,36.5,10.0,-1.0],[486.5,42.0,9.5,-1.0],[667.5,41.0,11.0,-1.5],[884.0,97.5,10.0,-1.0],[1081.5,38.0,10.0,-1.5],[1221.0,30.5,9.0,-6.0],[1411.0,35.5,9.5,-1.0]],
+ [[106.5,211.5,11.0,1.0],[297.0,211.5,10.5,1.5],[472.0,217.0,11.0,-2.0],[660.5,217.5,10.5,-2.0],[865.0,280.5,12.5,2.5],[1078.5,217.0,11.0,1.0],[1212.5,208.0,11.5,-5.5],[1398.0,208.5,11.5,3.0]],
+ [[105.0,395.0,10.0,-0.5],[296.5,395.0,10.0,2.0],[477.5,396.0,9.5,0.0],[659.0,396.0,10.0,0.0],[873.5,473.0,10.5,-1.5],[1081.0,398.5,10.0,-0.5],[1213.0,388.5,10.5,-4.5],[1395.5,389.0,10.0,-1.0]],
+ [[102.0,575.5,12.0,0.0],[298.0,575.0,11.5,0.5],[474.5,578.5,11.5,-0.5],[661.0,578.5,12.0,0.0],[869.5,643.0,11.0,-0.5],[1076.5,578.5,12.0,0.0],[1209.5,566.0,9.5,-6.5],[1400.5,567.0,12.0,0.5]],
+ [[109.0,758.5,12.0,0.5],[300.5,762.0,11.5,0.0],[485.5,762.5,12.0,-3.0],[664.0,764.5,12.0,-2.0],[877.5,827.5,10.0,-3.0],[1086.0,766.0,12.0,-1.5],[1216.5,750.0,10.5,-2.5],[1403.5,748.5,12.0,-1.5]],
+ [[107.5,934.5,11.0,2.0],[298.0,935.5,10.5,1.0],[477.5,936.5,10.0,-1.0],[660.5,936.5,10.5,-1.0],[857.0,1008.5,10.5,-1.0],[1080.5,938.0,10.5,-1.0],[1212.5,931.5,10.5,-5.0],[1404.0,931.0,10.0,-1.0]]
+];
+// One authored face tile. Transparent corners leave the fringe and jaw silhouette visible.
+const faceTile = [
+ '     fff     fff    ',
+ '   fffffff fffffff  ',
+ 'sfffddddffffffdddffs',
+ 'sffddwwddffffdwwddfs',
+ 'sfffwhiddffffwhiddfs',
+ 'sfffwiiddffffwiiddfs',
+ 'sfffwiirdffffwiirdfs',
+ 'sfffwrrrdffffwrrrdfs',
+ 'sffffaaaffffffaafffs',
+ ' sffbbffffffsffffbs ',
+ '  sffffffffffffffs  ',
+ '   sffffffffmmffs   ',
+ '    ssfffffffffs    ',
+ '      sssssssss     '
+];
+function drawCombatFaces(rows) {
+ const colors = {s:'#e7a582',f:'#ffd4ac',d:'#302335',w:'#fff3df',h:'#ffffff',
+  i:'#463046',r:'#895a6b',a:'#9c695c',b:'#efa399',m:'#904c58'};
+ rows.forEach((frames,member)=>frames.forEach((frame,pose)=>{
+  const [eyeX,eyeY,dx,dy] = combatEyes[member][pose];
+  const unit = Math.hypot(dx,dy)/9, cos=dx/(9*unit), sin=dy/(9*unit);
+  const cx = eyeX-frame.x+1, cy = eyeY-frame.y+1;
+  const c=frame.image.getContext('2d');
+  c.save();
+  c.globalCompositeOperation='source-atop';
+  // Inverse sample onto integer sprite pixels so tilted poses have crisp edges.
+  for(let y=Math.max(0,Math.floor(cy-22*unit));y<Math.min(frame.height,cy+22*unit);y++){
+   for(let x=Math.max(0,Math.floor(cx-22*unit));x<Math.min(frame.width,cx+22*unit);x++){
+    const u=Math.floor(((x-cx)*cos+(y-cy)*sin)/unit+6);
+    const v=Math.floor((-(x-cx)*sin+(y-cy)*cos)/unit+5);
+    const color=colors[faceTile[v]?.[u]];
+    if(color){c.fillStyle=color;c.fillRect(x,y,1,1);}
    }
   }
   c.restore();
@@ -176,6 +210,7 @@ function extractSprites(image){
  if(rows.some(row=>row.length!==8))throw new Error('Sprite atlas must contain six rows of eight poses: '+rows.map(r=>r.length).join(','));
  styleCombatHair(rows,w/1400);
  finishCombatCostumes(rows,w/1400);
+ drawCombatFaces(rows);
  return rows;
 }
 function loadPixelArt(){
