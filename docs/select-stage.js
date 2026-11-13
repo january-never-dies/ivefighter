@@ -1,7 +1,7 @@
 // Draw the selection room and mat on one pixel grid so their edges line up.
 const selectionStage = (() => {
   const canvas = document.getElementById('select-stage');
-  const room = canvas.parentElement;
+  const slide = document.getElementById('slide');
   const poster = document.getElementById('poster');
   const ctx = canvas.getContext('2d');
   const marks = [
@@ -22,10 +22,10 @@ const selectionStage = (() => {
   }
 
   function draw() {
-    if (!room.clientWidth || !room.clientHeight) return;
-    const grid = room.clientWidth < 600 ? 2 : 3;
-    const w = canvas.width = Math.ceil(room.clientWidth / grid);
-    const h = canvas.height = Math.ceil(room.clientHeight / grid);
+    if (!canvas.clientWidth || !canvas.clientHeight) return;
+    const grid = canvas.clientWidth < 600 ? 2 : 3;
+    const w = canvas.width = Math.ceil(canvas.clientWidth / grid);
+    const h = canvas.height = Math.ceil(canvas.clientHeight / grid);
     const horizon = Math.floor(h * 0.77);
     ctx.fillStyle = '#f8f5fc';
     ctx.fillRect(0, 0, w, h);
@@ -48,9 +48,14 @@ const selectionStage = (() => {
         ctx.fillRect(Math.round(w / 2 + seam * spacing), y, 1, 1);
       }
     }
-    const cx = Math.round(poster.clientWidth / grid / 2);
-    const cy = Math.round(h * 0.89);
-    const rx = Math.max(12, Math.floor(cx * 0.84)), ry = Math.max(6, Math.round(h * 0.073));
+    const scene = canvas.getBoundingClientRect();
+    const pose = slide.getBoundingClientRect();
+    const landscape = matchMedia('(orientation: landscape)').matches;
+    const cx = Math.round((pose.left - scene.left + pose.width / 2) / grid);
+    const image = slide.lastElementChild;
+    const imageHeight = image?.naturalWidth ? Math.min(pose.height, pose.width * image.naturalHeight / image.naturalWidth) : pose.height;
+    const cy = landscape ? Math.round((pose.bottom - scene.top - imageHeight * .09) / grid) : Math.round(h * .89);
+    const rx = Math.max(12, Math.floor(landscape ? Math.min(poster.clientWidth * .44, imageHeight * .39) / grid : cx * .84)), ry = Math.max(6, Math.round(h * 0.073));
     function oval(insetX, insetY, offset, color) {
       ctx.fillStyle = color;
       const radius = ry - insetY;
@@ -67,6 +72,7 @@ const selectionStage = (() => {
     const sx = Math.max(2, Math.floor(rx / 9)), sy = Math.max(1, Math.floor((ry - 3) / 5));
     stamp(marks[member], cx - sx * 4, cy - sy * 4, sx, sy, accent);
   }
-  new ResizeObserver(draw).observe(room);
+  new ResizeObserver(draw).observe(canvas);
+  slide.addEventListener('load', draw, true);
   return (index, color) => { member = index; accent = color; draw(); };
 })();

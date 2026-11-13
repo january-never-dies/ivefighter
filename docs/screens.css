@@ -174,3 +174,69 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
  .title-logo { animation: title-hover 1.7s ease-in-out infinite alternate; }
  .title-logo.striking { animation-play-state: paused; }
 }
+
+@media (orientation: landscape) {
+  body[data-screen="selection"] main { max-width: none; padding: 0; }
+  #selection {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
+    column-gap: clamp(18px, 4vw, 90px);
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: clamp(12px, 3vh, 36px) clamp(16px, 5vw, 100px);
+    border: 0;
+    box-shadow: none;
+    background: #f8f5fc;
+  }
+  #selection .studio { display: contents; }
+  #select-stage { z-index: -1; }
+  #selection .select-head {
+    grid-column: 1 / -1;
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  #selection .select-head h2 { color: #392641; text-shadow: 2px 2px #fff; }
+  #selection .select-head button { color: #392641; background: #faf7ffed; }
+  #poster { position: relative; inset: auto; grid-column: 1; grid-row: 2 / -1; }
+  #slide { inset: 1% 5% 0; }
+  #slide img { object-position: center bottom; }
+  #poster button { top: 50%; bottom: auto; }
+  #selection .dossier, #selection .desk {
+    position: relative;
+    inset: auto;
+    transform: none;
+    grid-column: 2;
+    width: min(100%, 550px);
+    justify-self: center;
+    padding: clamp(12px, 2vw, 26px);
+    background: #241c34ed;
+  }
+  #selection .dossier { grid-row: 3; align-self: end; border-width: 3px 0 0; box-shadow: none; }
+  #selection .desk { grid-row: 4; padding-top: 0; }
+  #selection .setup { gap: 7px; }
+  #selection .setup #matchup { width: 100%; }
+  #selection .names button { background: #30283b; }
+  #selection .names button[aria-pressed=true] { background: var(--member); }
+}
+@media (orientation: landscape) and (max-height: 570px) {
+  #selection { padding: 6px 2vw; grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr); gap: 0 2vw; }
+  #selection .dossier, #selection .desk { padding: 6px 10px; }
+  #selection .dossier h3 { font-size: 22px; margin: 2px 0; }
+  #selection #stats { margin-top: 4px; }
+  #selection #stats div { margin: 3px 0; }
+  #selection #kitGuide { margin-top: 4px; padding-top: 3px; line-height: 1.25; }
+  #selection #tip { margin: 4px 0; }
+  #selection .names button, #selection .flow-cta { padding: 5px 3px; }
+  #selection .setup { padding-top: 4px; }
+}
+@media (orientation: landscape) and (max-height: 570px) {
+  #selection { grid-template-columns: minmax(0, 1fr) minmax(300px, 1.15fr); }
+  #selection .dossier { display: grid; grid-template-columns: 1fr 1.35fr; gap: 2px 12px; }
+  #selection .dossier > :is(small,h3,b) { grid-column: 1; }
+  #selection #stats { grid-column: 2; grid-row: 1 / 4; }
+  #selection #kitGuide { grid-column: 1 / -1; }
+}
