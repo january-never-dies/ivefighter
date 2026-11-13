@@ -80,11 +80,15 @@ const cutCanvas = $('title-cut');
 const cutContext = cutCanvas.getContext('2d');
 const titleImage = $('game-title').querySelector('img');
 
+const bladeDuration = .21;
+const slideDuration = 1.05;
+const cutDuration = bladeDuration + slideDuration + .16;
+
 function drawTitleCut(time) {
  const c = cutContext, w = cutCanvas.width, h = cutCanvas.height;
- const travel = Math.min(1, time / .34);
+ const travel = Math.min(1, time / bladeDuration);
  const tip = w * travel;
- const slide = 1 - (1 - Math.min(1, Math.max(0, (time - .34) / .20))) ** 3;
+ const slide = 1 - (1 - Math.min(1, Math.max(0, (time - bladeDuration) / slideDuration))) ** 3;
  const cutY = x => h * (.92 - .82 * x / w);
  c.clearRect(0, 0, w, h);
  c.imageSmoothingEnabled = false;
@@ -131,8 +135,8 @@ function animateCut(onFinish, startSound = false) {
    elapsed += Math.min((now-previous)/1000, .05);
   }
   previous = now;
-  drawTitleCut(reduced ? .55 : elapsed);
-  if (elapsed < (reduced ? .32 : .90)) cutFrame = requestAnimationFrame(frame);
+  drawTitleCut(reduced ? cutDuration : elapsed);
+  if (elapsed < (reduced ? .32 : cutDuration)) cutFrame = requestAnimationFrame(frame);
   else onFinish?.();
  }
  cutFrame = requestAnimationFrame(frame);

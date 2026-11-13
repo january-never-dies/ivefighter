@@ -110,7 +110,7 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
 .title-logo.striking img { opacity: 0; }
 .title-logo.striking #title-cut { display: block; }
 .title-subtitle, .title-credit, #enter { text-shadow: 2px 2px #231725, 0 0 5px #1a1520; }
-.title-subtitle { margin: 0; color: #ffe5a7; font-size: clamp(17px, 3vw, 36px); letter-spacing: .12em; }
+.title-subtitle { margin: 0; color: #ffe5a7; font-size: clamp(17px, 3vw, 36px); letter-spacing: -.025em; }
 .title-credit { margin: 0; color: #fff; font-size: clamp(10px, 1.5vw, 18px); }
 @media (max-aspect-ratio: 1/1) {
   .title-screen { grid-template-rows: 1fr auto minmax(54px, 10svh) minmax(42px, 8svh) .65fr; }
