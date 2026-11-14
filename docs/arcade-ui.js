@@ -130,7 +130,7 @@ function waiting() {
  actions(['SELECT FIGHTER',()=>{selectScreen();$('online-ready').focus();}],['EXIT ROOM',lobby]);
 }
 function previewBattle() {
- page('ONLINE BATTLE','<small>대전 화면 미리보기</small><div class="vs-preview"><img alt="'+roster[chosen[0]].name+'" src="assets/pose-'+chosen[0]+'.png"><b>VS</b><img alt="'+roster[chosen[1]].name+'" src="assets/pose-'+chosen[1]+'.png"></div>');
+ page('ONLINE BATTLE','<small>대전 화면 미리보기</small><div class="vs-preview"><img alt="'+roster[chosen[0]].name+'" src="assets/pose-'+chosen[0]+'.png?v=revision20261115"><b>VS</b><img alt="'+roster[chosen[1]].name+'" src="assets/pose-'+chosen[1]+'.png?v=revision20261115"></div>');
  actions(['결과 미리보기',onlineResult],['EXIT ROOM',lobby]);
 }
 function onlineResult() {
