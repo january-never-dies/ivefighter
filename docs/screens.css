@@ -259,10 +259,10 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
  display:grid; place-items:center;
  font-size:42px; line-height:1;
  color:var(--accent); background:transparent; border:0; box-shadow:none;
- text-shadow:0 0 2px #fff,0 0 7px var(--accent),0 0 15px var(--accent);
+ text-shadow:0 0 7px var(--accent),0 0 15px var(--accent);
 }
 #selection #poster button:hover {
- color:#fff;
+ color:var(--accent);
  text-shadow:0 0 3px var(--accent),0 0 9px var(--accent),0 0 20px var(--accent);
 }
 @media(max-width:600px){
