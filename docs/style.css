@@ -20,4 +20,4 @@ body { font-synthesis: none; }
 /* Native-resolution pixel artwork: crisp integer pixel sampling. */
 #arena,.card canvas{image-rendering:pixelated;image-rendering:crisp-edges}.game{border-color:#b488bc;box-shadow:0 0 0 4px #28203d,0 0 0 6px #100b1c,0 18px 60px #0007}.card{background:repeating-linear-gradient(0deg,#211b31 0px,#211b31 3px,#241e35 3px,#241e35 6px)}.card canvas{height:175px}.hp{border-radius:0;box-shadow:2px 3px #101024}.primary{box-shadow:4px 4px #51314b!important}.primary:disabled{opacity:.6;cursor:wait}.eyebrow,.arena-top,.arena-bottom,.timer small{font-family:var(--arcade-font)}.arena-bottom{background:#100c2177;padding:4px 6px}.center h2{font-size:clamp(26px,4vw,58px)}@media(max-width:800px){.card canvas{height:135px}.center h2{font-size:26px}}
 
-#kitGuide{font-size:14px;line-height:1.6;padding:12px 16px;border-left:3px solid #ff82bb;background:#211b2c;color:#f3eaf3}
+#kitGuide{font-size:14px;line-height:1.6;padding:12px 16px;border-left:3px solid var(--accent, #ff82bb);background:#211b2c;color:#f3eaf3}
