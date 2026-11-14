@@ -268,3 +268,5 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
 @media(max-width:600px){
  #selection #poster button { width:44px; height:48px; font-size:36px; }
 }
+
+#play footer #reset { margin-left:auto; }
