@@ -236,7 +236,7 @@ body[data-screen="welcome"] main { max-width: none; padding: 0 3vw; }
 }
 
 /* Title spacing and selection details. */
-.title-lockup { position:relative; top:-5px; }
+.title-lockup { position:relative; top:-15px; }
 .title-subtitle { margin-top:-.45em; -webkit-text-stroke:.45px #ffba48; }
 #selection #home { border:0; box-shadow:none; background:transparent; }
 #selection .pick button[aria-pressed="false"] { border-color:#ff83bc; }
