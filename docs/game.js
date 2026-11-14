@@ -54,6 +54,14 @@ let swipe=null;
 $('poster').onpointerdown=e=>{if(e.target.closest('button'))return;swipe=[e.clientX,e.clientY,e.pointerId];$('poster').setPointerCapture(e.pointerId);};
 $('poster').onpointercancel=()=>{swipe=null;};
 $('poster').onpointerup=e=>{if(!swipe||e.pointerId!==swipe[2])return;const dx=e.clientX-swipe[0],dy=e.clientY-swipe[1];swipe=null;if(Math.abs(dx)>30&&Math.abs(dx)>Math.abs(dy))browse(dx<0?1:-1);};
+const selectionSkills=[
+ ['유성 찌르기로 긴 봉을 뻗어 상대의 접근을 끊어요.','만월 봉무로 봉을 두 번 휘둘러 공격해요. 두 번째는 하단을 노려요.'],
+ ['슬립 킥으로 낮게 미끄러져 표창을 피하고 다리를 걸어요.','초승달 도약으로 앞으로 뛰어들어 앉아 가드하는 상대를 공략해요.'],
+ ['수학의 정석을 펼쳐 앞쪽 바닥에 명제를 설치해요. 다가오는 상대를 수식으로 막아요.','최종 증명으로 세 개의 수식을 연달아 설치해 더 넓은 바닥을 장악해요.'],
+ ['지반 강타로 가까운 상대의 발밑을 흔들어 큰 피해를 줘요.','루프톱 브레이커로 더 넓은 지면을 강타해 상대를 밀어내요.'],
+ ['청색 표창을 던져 멀리 있는 상대를 견제해요.','삼연성으로 표창 세 개를 연달아 날려 상대를 몰아붙여요.'],
+ ['홍사 휘감기로 땋은 머리를 길게 뻗어 먼 상대를 가까이 끌어와요.','쌍홍 나선으로 더 먼 상대까지 휘감아 당기며 강한 피해를 줘요.']
+];
 function renderCards(direction=0){
  const i=chosen[pick], fighter=roster[i], list=$('roster');
  if(i!==displayed){
@@ -66,12 +74,16 @@ function renderCards(direction=0){
   displayed=i;
  }
  $('selection').style.setProperty('--accent',fighter.color);
- selectionStage(i, fighter.color);$('roman').textContent=String(i+1).padStart(2,'0')+' / 06　'+fighter.roman;
+ selectionStage(i, fighter.color);$('roman').textContent=fighter.roman;
  $('fighterName').textContent=fighter.name;$('styleName').textContent=fighter.style;
  $('stats').replaceChildren(...[['이동 속도',fighter.speed,5.1],['공격 배율',fighter.power,1.24],['기본 리치 배율',fighter.reach,1.05]].map(([label,value,max])=>{
   const row=document.createElement('div'),name=document.createElement('span'),num=document.createElement('strong'),bar=document.createElement('i');
   name.textContent=label;num.textContent=value.toFixed(2);bar.style.setProperty('--fill',value/max*100+'%');row.append(name,num,bar);return row;}));
- $('kitGuide').textContent='Q　'+fighter.q+'\nR　'+fighter.r;
+ $('kitGuide').replaceChildren(...selectionSkills[i].map((description,n)=>{
+  const line=document.createElement('p'),label=document.createElement('strong');
+  label.textContent=n?'초필살기':'고유기';line.append(label,document.createTextNode(description));return line;
+ }));
+ $('cpuDifficulty').hidden=pick!==1;
  $('tip').textContent=fighter.tip;
  $('matchup').textContent='P1　'+roster[chosen[0]].name+'　 VS　 '+roster[chosen[1]].name+'　CPU';
  list.replaceChildren();
